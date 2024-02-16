@@ -12,7 +12,12 @@ s = []
 diff = 40000
 for i in range(n):
     s.append(list(map(int, read().split())))
+
+length = len(list(combinations(players, n // 2))) // 2
 for com in combinations(players, n // 2):
+    length -= 1
+    if length < 0:
+        break
     a = 0
     b = 0
     for pair in combinations(com, 2):
