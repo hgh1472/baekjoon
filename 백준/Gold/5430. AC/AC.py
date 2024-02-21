@@ -1,57 +1,24 @@
 import sys
-from collections import deque
 
 read = sys.stdin.readline
 
-
-def commands(command, nums):
-    reverse = False
-    for com in command:
-        if com == 'D':
-            if len(nums) == 0:
-                print("error")
-                return
-            else:
-                if not reverse:
-                    nums.popleft()
-                if reverse:
-                    nums.pop()
-        if com == 'R':
-            if reverse:
-                reverse = False
-            elif not reverse:
-                reverse = True
-    if not reverse:
-        print("[", end='')
-        for i in range(len(nums)):
-            print(nums[i], end='')
-            if i != len(nums) - 1:
-                print(",", end='')
-        print("]")
-    if reverse:
-        print("[", end='')
-        for i in range(len(nums) - 1, -1, -1):
-            print(nums[i], end='')
-            if i != 0:
-                print(",", end='')
-        print("]")
-
-
 T = int(read())
 for i in range(T):
-    command = list(read().rstrip())
+    # RR은 삭제, R을 기준으로 명령을 나눈다, D가 몇번나왔는지 길이로 저장
+    commands  = [*map(len, input().rstrip().replace("RR", "").split("R"))]
     n = int(read())
-    string = read().rstrip()
-    nums = deque()
-    num = 0
-    if n != 0:
-        for char in string:
-            if '0' <= char <= '9':
-                num *= 10
-                num += ord(char) - ord('0')
-            elif char == '[':
-                continue
-            else:
-                nums.append(num)
-                num = 0
-    commands(command, nums)
+    numbers = read().strip('[]\n').split(",")
+    reverse = (len(commands) + 1) % 2
+
+    # command의 짝수 인덱스는 리버스되지 않은 상태에서의 D
+    front = sum(commands[0::2])
+    # command의 홀수 인덱스는 리버스된 상태에서의 D
+    back = sum(commands[1::2])
+    if front + back > n:
+        print("error")
+        continue
+    else:
+        numbers = numbers[front:n-back]
+    if reverse:
+        numbers.reverse()
+    print("[", ",".join(numbers), "]", sep="")
