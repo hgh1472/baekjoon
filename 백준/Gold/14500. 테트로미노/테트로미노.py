@@ -1,55 +1,42 @@
 import sys
 
-sys.setrecursionlimit(1000000)
+input = sys.stdin.readline
+dx = [-1, 1, 0, 0]
+dy = [0, 0, 1, -1]
 
-read = sys.stdin.readline
-tetris=[[(0,0),(0,1),(0,2),(0,3)],\
-        [(0,0),(1,0),(2,0),(3,0)],\
-        [(0,0),(1,0),(0,1),(1,1)],\
-        [(0,0),(1,0),(2,0),(2,1)],\
-        [(0,1),(1,1),(2,1),(2,0)],\
-        [(0,0),(0,1),(1,1),(2,1)],\
-        [(0,0),(0,1),(1,0),(2,0)],\
-        [(0,0),(1,0),(1,1),(1,2)],\
-        [(0,2),(1,1),(1,2),(1,0)],\
-        [(0,0),(0,1),(0,2),(1,2)],\
-        [(0,0),(1,0),(0,1),(0,2)],\
-        [(0,0),(1,0),(1,1),(2,1)],\
-        [(0,1),(1,1),(1,0),(2,0)],\
-        [(1,0),(1,1),(0,1),(0,2)],\
-        [(0,0),(0,1),(1,1),(1,2)],\
-        [(0,1),(1,0),(1,1),(1,2)],\
-        [(0,0),(0,1),(0,2),(1,1)],\
-        [(0,0),(1,0),(1,1),(2,0)],\
-        [(0,1),(1,1),(1,0),(2,1)]]
-
-n, m = map(int, read().split())
+n, m = map(int, input().split())
 paper = []
+visited = [[False] * m for _ in range(n)]
+max_val = 0
+for i in range(n):
+    paper.append(list(map(int, input().split())))
+    max_val = max(max(paper[i]), max_val)
+
+max_sum = 0
+
+
+def dfs(x, y, step, value):
+    if step == 4:
+        global max_sum
+        max_sum = max(max_sum, value)
+        return
+    if (4 - step) * max_val + value <= max_sum:
+        return
+
+    for i in range(4):
+        nx = x + dx[i]
+        ny = y + dy[i]
+        if 0 <= nx < n and 0 <= ny < m and visited[nx][ny] is False:
+            visited[nx][ny] = True
+            dfs(nx, ny, step + 1, value + paper[nx][ny])
+            if step == 2:
+                dfs(x, y, step + 1, value + paper[nx][ny])
+            visited[nx][ny] = False
 
 
 for i in range(n):
-    paper.append(list(map(int, read().split())))
-
-max_count = 0
-
-
-def brute(x, y):
-    if x >= n:
-        return
-    if y >= m:
-        brute(x + 1, 0)
-        return
-    global max_count
-    for block in tetris:
-        local = 0
-        for dx, dy in block:
-                nx = x + dx
-                ny = y + dy
-                if 0 <= nx < n and 0 <= ny < m:
-                    local += paper[nx][ny]
-        if max_count < local:
-            max_count = local
-    brute(x, y + 1)
-
-brute(0, 0)
-print(max_count)
+    for j in range(m):
+        visited[i][j] = True
+        dfs(i, j, 1, paper[i][j])
+        visited[i][j] = False
+print(max_sum)
