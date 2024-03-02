@@ -8,13 +8,12 @@ for i in range(n):
     coin = int(input())
     if coin > k:
         continue
-    values[coin] = 1
+    coins.append(coin)
+values[0] = 0
+for coin in coins:
+    for i in range(coin, k+1):
+        values[i] = min(values[i - coin] + 1, values[i])
 
-for i in range(k+1):
-    if values[i] == 1:
-        continue
-    for j in range(i // 2 + 1):
-        values[i] = min(values[i], values[j] + values[i - j])
 if values[k] == sys.maxsize:
     print(-1)
 else:
