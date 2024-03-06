@@ -1,4 +1,4 @@
-# max(가장 긴 증가하는 수열, 가장 긴 감소하는 수열)
+# 가장 긴 증가하는 수열
 import sys
 
 input = sys.stdin.readline
