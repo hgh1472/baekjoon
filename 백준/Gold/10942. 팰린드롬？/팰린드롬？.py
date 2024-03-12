@@ -37,8 +37,7 @@ for i in range(m):
         e -= 1
         std = (s + e) // 2
         dis = e - std
-        flag = dp[std][dis]
-        if flag != 2:
+        if dp[std][dis] != 2:
             print(0)
         else:
             if numbers[std] == numbers[e + 1]:
