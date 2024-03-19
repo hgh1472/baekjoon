@@ -1,13 +1,12 @@
 import sys
 from collections import deque
-input = sys.stdin.readline
 
 def bfs():
-    n, m = map(int, input().split())
+    n, m = map(int, sys.stdin.readline().split())
     direction = [[1,0],[-1,0],[0,-1],[0,1]]
     info = []
     for i in range(n):
-        info.append(list(input().rstrip()))
+        info.append(list(sys.stdin.readline().rstrip()))
 
     visited = [[[False, False] for _ in range(m)] for _ in range(n)]
     visited[0][0][0] = visited[0][0][1] = True
