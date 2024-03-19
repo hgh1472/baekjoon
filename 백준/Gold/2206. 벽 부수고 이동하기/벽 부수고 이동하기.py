@@ -22,17 +22,18 @@ def bfs():
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
-            if 0 <= nx < n and 0 <= ny < m:
-                if info[nx][ny] == '1':
-                    if broke == 1 or visited[nx][ny][1]:
-                        continue
-                    visited[nx][ny][1] = True
-                    q.append([nx, ny, distance + 1, 1])
-                else:
-                    if visited[nx][ny][broke]:
-                        continue
-                    visited[nx][ny][broke] = True
-                    q.append([nx, ny, distance + 1, broke])
+            if nx < 0 or nx == n or ny < 0 or ny == m:
+                continue
+            if visited[nx][ny][broke]:
+                continue
+            if info[nx][ny] == '1':
+                if broke == 1:
+                    continue
+                q.append([nx, ny, distance + 1, broke + 1])
+                visited[nx][ny][1] = True
+            else:
+                q.append([nx, ny, distance + 1, broke])
+                visited[nx][ny][broke] = True
     print(-1)
 
 
