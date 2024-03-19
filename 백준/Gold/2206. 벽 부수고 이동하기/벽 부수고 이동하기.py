@@ -4,16 +4,14 @@ dx = [-1, 1, 0, 0]
 dy = [0, 0, -1, 1]
 input = sys.stdin.readline
 
-n, m = map(int, input().split())
-
-info = []
-visited = [[[False, False] for _ in range(m)] for _ in range(n)]
-for i in range(n):
-    info.append(list(input().rstrip()))
-visited[0][0][0] = visited[0][0][1] = True
-
-
 def bfs():
+    n, m = map(int, input().split())
+
+    info = []
+    for i in range(n):
+        info.append(list(input().rstrip()))
+    visited = [[[False, False] for _ in range(m)] for _ in range(n)]
+    visited[0][0][0] = visited[0][0][1] = True
     q = deque()
     q.append([0, 0, 1, 0])
     while q:
@@ -39,4 +37,3 @@ def bfs():
 
 
 bfs()
-
