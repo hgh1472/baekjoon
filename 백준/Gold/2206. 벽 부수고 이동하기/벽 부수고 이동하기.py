@@ -23,16 +23,16 @@ def bfs():
             ny = y + dy[i]
             if 0 <= nx < n and 0 <= ny < m:
                 if broke == 1 and info[nx][ny] == '0':
-                    if visited[nx][ny][broke] > distance + 1 or visited[nx][ny][broke] == 0:
+                    if visited[nx][ny][broke] == 0:
                         visited[nx][ny][broke] = distance + 1
                         q.append([nx, ny, distance + 1, broke])
                 elif broke == 0:
                     if info[nx][ny] == '0':
-                        if visited[nx][ny][broke] > distance + 1 or visited[nx][ny][broke] == 0:
+                        if visited[nx][ny][broke] == 0:
                             visited[nx][ny][broke] = distance + 1
                             q.append([nx, ny, distance + 1, broke])
                     else:
-                        if visited[nx][ny][1] > distance + 1 or visited[nx][ny][1] == 0:
+                        if visited[nx][ny][1] == 0:
                             visited[nx][ny][1] = distance + 1
                             q.append([nx, ny, distance + 1, 1])
 
