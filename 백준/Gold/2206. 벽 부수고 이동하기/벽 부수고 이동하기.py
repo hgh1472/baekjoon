@@ -4,15 +4,14 @@ input = sys.stdin.readline
 
 def bfs():
     n, m = map(int, input().split())
-    dx = [-1, 1, 0, 0]
-    dy = [0, 0, -1, 1]
+    direction = [[1,0],[-1,0],[0,-1],[0,1]]
     info = []
     for i in range(n):
         info.append(list(input().rstrip()))
-        
+
     visited = [[[False, False] for _ in range(m)] for _ in range(n)]
     visited[0][0][0] = visited[0][0][1] = True
-    
+
     q = deque()
     q.append([0, 0, 1, 0])
     while q:
@@ -20,9 +19,9 @@ def bfs():
         if x == n-1 and y == m-1:
             print(distance)
             return
-        for i in range(4):
-            nx = x + dx[i]
-            ny = y + dy[i]
+        for dx, dy in direction:
+            nx = x + dx
+            ny = y + dy
             if nx < 0 or nx == n or ny < 0 or ny == m:
                 continue
             if visited[nx][ny][broke]:
