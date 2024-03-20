@@ -14,14 +14,7 @@ def find(n):
 def union(a, b):
     x = find(a)
     y = find(b)
-    if x == y:
-        return
-    if rank[x] < rank[y]:
-        sack[x] = y
-    else:
-        sack[y] = x
-        if rank[x] == rank[y]:
-            rank[x] += 1
+    sack[y] = x
 
 
 v, e = map(int, input().split())
@@ -29,9 +22,10 @@ q = []
 for i in range(e):
     a, b, w = map(int, input().split())
     heapq.heappush(q, (w, a, b))
-sack = [i for i in range(v + 1)]
-rank = [0] * (v + 1)
+sack = [0]
 weights = 0
+for i in range(1, v + 1):
+    sack.append(i)
 count = 0
 while count != v-1:
     w, a, b = heapq.heappop(q)
