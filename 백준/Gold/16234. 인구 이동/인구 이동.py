@@ -6,10 +6,10 @@ dx = [-1, 1, 0, 0]
 dy = [0, 0, -1, 1]
 
 
-def bfs(x, y, l, r):
-    q= deque()
+def bfs(x, y):
+    q = deque()
     q.append([x, y])
-    visited[x][y] = 1
+    visited[x][y] = day
     pos = [[x, y]]
     populations = nations[x][y]
     while q:
@@ -17,16 +17,17 @@ def bfs(x, y, l, r):
         for i in range(4):
             nx = a + dx[i]
             ny = b + dy[i]
-            if 0 <= nx < n and 0 <= ny < n and visited[nx][ny] == 0:
+            if 0 <= nx < n and 0 <= ny < n and visited[nx][ny] != day:
                 if l <= abs(nations[a][b] - nations[nx][ny]) <= r:
                     pos.append([nx, ny])
-                    visited[nx][ny] = 1
+                    visited[nx][ny] = day
                     populations += nations[nx][ny]
                     q.append([nx, ny])
     count = len(pos)
     for a, b in pos:
         nations[a][b] = populations // count
     return count
+
 
 n, l, r = map(int, input().split())
 nations = []
@@ -35,14 +36,14 @@ for i in range(n):
 
 day = -1
 flag = 1
+visited = [[-1] * n for _ in range(n)]
 while flag == 1:
     day += 1
     flag = 0
-    visited = [[0] * n for _ in range(n)]
     for i in range(n):
         for j in range(n):
-            if visited[i][j] == 0:
-                change = bfs(i, j, l, r)
+            if visited[i][j] != day:
+                change = bfs(i, j)
                 if change >= 2:
                     flag = 1
 
