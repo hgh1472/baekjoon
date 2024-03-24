@@ -16,6 +16,8 @@ for i in range(1, N+1):
     heapq.heappush(q, (0, i))
     while q:
         d, a = heapq.heappop(q)
+        if distance[a] < d:  # 현재보다 더 짧은 간선이 이미 반영된 경우
+            continue
         for end, time in bridge[a]:
             if distance[a] + time < distance[end]:
                 distance[end] = distance[a] + time
