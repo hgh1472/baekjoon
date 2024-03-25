@@ -10,7 +10,7 @@ def bfs(start, g):
     while q:
         node = q.popleft()
         for c in edge[node]:
-            if visited[c] == 0:
+            if visited[c] == -1:
                 visited[c] = (visited[node] + 1) % 2
                 q.append(c)
             else:
@@ -27,10 +27,10 @@ for _ in range(k):
         a, b = map(int, input().split())
         edge[a].append(b)
         edge[b].append(a)
-    visited = [0] * (v+1)
+    visited = [-1] * (v+1)
     divisible = True
     for i in range(1, v+1):
-        if visited[i] == 0 and len(edge[i]) != 0:
+        if visited[i] == -1 and len(edge[i]) != 0:
             divisible = bfs(i, visited[i])
         if not divisible:
            break
