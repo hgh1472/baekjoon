@@ -30,7 +30,7 @@ for _ in range(k):
     visited = [0] * (v+1)
     divisible = True
     for i in range(1, v+1):
-        if visited[i] == 0:
+        if visited[i] == 0 and len(edge[i]) != 0:
             divisible = bfs(i, visited[i])
         if not divisible:
            break
