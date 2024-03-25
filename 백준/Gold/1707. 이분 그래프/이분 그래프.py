@@ -22,7 +22,7 @@ def bfs(start, g):
 k = int(input())
 for _ in range(k):
     v, e = map(int, input().split())
-    edge = [[]for _ in range(v+1)]
+    edge = [[] for _ in range(v+1)]
     for i in range(e):
         a, b = map(int, input().split())
         edge[a].append(b)
@@ -30,7 +30,8 @@ for _ in range(k):
     visited = [0] * (v+1)
     divisible = True
     for i in range(1, v+1):
-        divisible = bfs(i, visited[i])
+        if visited[i] == 0:
+            divisible = bfs(i, visited[i])
         if not divisible:
            break
     if divisible:
