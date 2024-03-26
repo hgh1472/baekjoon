@@ -13,8 +13,9 @@ def dijkstra(start):
         if dist > visited[start][node]:
             continue
         for dst, dis in graph[node]:
-            if visited[start][dst] > visited[start][node] + dis:
-                visited[start][dst] = visited[start][node] + dis
+            cost = visited[start][node] + dis
+            if visited[start][dst] > cost:
+                visited[start][dst] = cost
                 heapq.heappush(q, [visited[start][dst], dst])
 
 
