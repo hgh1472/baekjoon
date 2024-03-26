@@ -30,7 +30,6 @@ v1, v2 = map(int, input().split())
 dijkstra(1)
 dijkstra(v1)
 dijkstra(v2)
-dijkstra(N)
 
 distance = 0
 distance += min(visited[1][v1] + visited[v2][N], visited[1][v2] + visited[v1][N])
