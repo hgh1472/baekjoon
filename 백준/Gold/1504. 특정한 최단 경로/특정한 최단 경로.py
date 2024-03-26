@@ -1,20 +1,21 @@
 import sys
 from collections import deque
+import heapq
 input = sys.stdin.readline
 
 
 def dijkstra(start):
     visited[start][start] = 0
-    q = deque()
-    q.append([0, start])
+    q = []
+    heapq.heappush(q, [0, start])
     while q:
-        dist, node = q.popleft()
+        dist, node = heapq.heappop(q)
         if dist > visited[start][node]:
             continue
         for dst, dis in graph[node]:
             if visited[start][dst] > visited[start][node] + dis:
                 visited[start][dst] = visited[start][node] + dis
-                q.append([visited[start][dst], dst])
+                heapq.heappush(q, [visited[start][dst], dst])
 
 
 N, E = map(int, input().split())
