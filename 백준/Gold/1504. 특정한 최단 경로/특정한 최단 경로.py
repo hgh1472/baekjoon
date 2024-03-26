@@ -5,23 +5,24 @@ input = sys.stdin.readline
 
 
 def dijkstra(start):
-    visited[start][start] = 0
+    visited = [sys.maxsize] * (N+1)
+    visited[start] = 0
     q = []
     heapq.heappush(q, [0, start])
     while q:
         dist, node = heapq.heappop(q)
-        if dist > visited[start][node]:
+        if dist > visited[node]:
             continue
-        for dst, dis in graph[node]:
-            cost = visited[start][node] + dis
-            if visited[start][dst] > cost:
-                visited[start][dst] = cost
-                heapq.heappush(q, [visited[start][dst], dst])
 
+        for dst, dis in graph[node]:
+            cost = visited[node] + dis
+            if visited[dst] > cost:
+                visited[dst] = cost
+                heapq.heappush(q, [visited[dst], dst])
+    return visited
 
 N, E = map(int, input().split())
 graph = [[] for _ in range(N+1)]
-visited = [[sys.maxsize] * (N+1) for _ in range(N+1)]
 for i in range(E):
     a, b, c = map(int, input().split())
     graph[a].append([b, c])
@@ -29,13 +30,13 @@ for i in range(E):
 
 v1, v2 = map(int, input().split())
 
-dijkstra(1)
-dijkstra(v1)
-dijkstra(v2)
+distance_1 = dijkstra(1)
+distance_v1 = dijkstra(v1)
+distance_v2 = dijkstra(v2)
 
 distance = 0
-distance += min(visited[1][v1] + visited[v2][N], visited[1][v2] + visited[v1][N])
-distance += visited[v1][v2]
+distance += min(distance_1[v1] + distance_v2[N], distance_1[v2] + distance_v1[N])
+distance += distance_v1[v2]
 if distance >= sys.maxsize:
     print(-1)
 else:
