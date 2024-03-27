@@ -5,7 +5,7 @@ dx = [-1, 1, 0, 0]
 dy = [0, 0, -1, 1]
 
 
-def bfs(a, b):
+def bfs(a, b, visited, melt_stack):
     bfs_q = deque()
     bfs_q.append((a, b))
     visited[a][b] = True
@@ -25,30 +25,35 @@ def bfs(a, b):
             melt_stack.append((x, y, melt_count))
 
 
+def sol():
+    year = 0
+    while True:
+        count = 0
+        visited = [[False] * m for _ in range(n)]
+        melt_stack = []
+        for i in range(n):
+            for j in range(m):
+                if info[i][j] != 0 and not visited[i][j]:
+                    if count == 1:
+                        print(year)
+                        return
+                    bfs(i, j, visited, melt_stack)
+                    count += 1
+        while melt_stack:
+            mx, my, melted = melt_stack.pop()
+            info[mx][my] = max(0, info[mx][my] - melted)
+        if count >= 2:
+            break
+        elif count == 0:
+            year = 0
+            break
+        year += 1
+
+    print(year)
+
+
 n, m = map(int, input().split())
 info = []
 for i in range(n):
     info.append(list(map(int, input().split())))
-
-year = 0
-while True:
-    count = 0
-    visited = [[False] * m for _ in range(n)]
-    melt_stack = []
-    for i in range(n):
-        for j in range(m):
-            if info[i][j] != 0 and not visited[i][j]:
-                bfs(i, j)
-                count += 1
-    while melt_stack:
-        mx, my, melted = melt_stack.pop()
-        info[mx][my] = max(0, info[mx][my] - melted)
-
-    if count >= 2:
-        break
-    elif count == 0:
-        year = 0
-        break
-    year += 1
-
-print(year)
+sol()
