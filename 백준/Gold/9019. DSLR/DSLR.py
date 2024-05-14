@@ -15,19 +15,15 @@ def s(number):
 
 
 def l(number):
-    d1 = number // 1000
-    d2 = number % 1000 // 100
-    d3 = number % 100 // 10
-    d4 = number % 10
-    return d2 * 1000 + d3 * 100 + d4 * 10 + d1
+    front = number % 1000
+    back = number // 1000
+    return front * 10 + back
 
 
 def r(number):
-    d1 = number // 1000
-    d2 = number % 1000 // 100
-    d3 = number % 100 // 10
-    d4 = number % 10
-    return d4 * 1000 + d1 * 100 + d2 * 10 + d3
+    front = number % 10
+    back = number // 10
+    return front * 1000 + back
 
 
 def calculate(number, op):
@@ -41,43 +37,40 @@ def calculate(number, op):
         return r(number)
 
 
-def change(number, coms):
-    for c in coms:
-        number = calculate(number, int(c))
-    return number
-
-
 def bfs(a, b):
     cmds = deque()
     duplicated = [False] * 10000
-    for i in range(1, 5):
-        tmp = calculate(a, i)
-        if tmp == b:
-            return str(i)
-        if not duplicated[tmp]:
-            duplicated[tmp] = True
-            cmds.append(str(i))
+    cmds.append([a,[]])
     while True:
-        cmd = cmds.popleft()
-        num = change(a, cmd)
+        num, cmd = cmds.popleft()
         for i in range(1, 5):
-            tmp = calculate(num, i)
+            tmp = 0
+            if i == 1:
+                tmp = num * 2 % 10000
+            if i == 2:
+                tmp = num - 1
+                if tmp == -1:
+                    tmp = 9999
+            if i == 3:
+                tmp = (num % 1000) * 10 + num // 1000
+            if i == 4:
+                tmp = (num % 10) * 1000 + num // 10
             if tmp != b:
                 if not duplicated[tmp]:
                     duplicated[tmp] = True
-                    cmds.append(cmd + str(i))
+                    cmds.append([tmp, cmd + [i]])
             else:
-                return cmd + str(i)
+                return cmd + [i]
 
 
 def convert(op):
-    if op == '1':
+    if op == 1:
         print('D', end='')
-    elif op == '2':
+    elif op == 2:
         print('S', end='')
-    elif op == '3':
+    elif op == 3:
         print('L', end='')
-    elif op == '4':
+    elif op == 4:
         print('R', end='')
 
 
