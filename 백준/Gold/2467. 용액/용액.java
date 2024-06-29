@@ -15,64 +15,23 @@ class Main {
         for (int i = 0; i < n; i++) {
             solutions[i] = Integer.parseInt(strings[i]);
         }
-        int minPH = 2000000000, tempPH;
-
-        int firstSolution = 0, secondSolution = 0;
-        for (int i = 0; i < n; i++) {
-            int pos = Arrays.binarySearch(solutions, -solutions[i]);
-            if (pos < 0) {
-                if (pos == -1) {
-                    if (i == 0) {
-                        tempPH = Math.abs(solutions[i] + solutions[i + 1]);
-                        if (minPH > tempPH) {
-                            minPH = tempPH;
-                            firstSolution = i;
-                            secondSolution = i + 1;
-                        }
-                    }
-                    else {
-                        tempPH = Math.abs(solutions[i] + solutions[0]);
-                        if (minPH > tempPH) {
-                            minPH = tempPH;
-                            firstSolution = i;
-                            secondSolution = 0;
-                        }
-                    }
-                }
-                else if (pos == -(n + 1)) {
-                    if (i == n - 1) {
-                        tempPH = Math.abs(solutions[i] + solutions[i-1]);
-                        if (tempPH < minPH) {
-                            minPH = tempPH;
-                            firstSolution = i;
-                            secondSolution = i-1;
-                        }
-                    }
-                    else {
-                        tempPH = Math.abs(solutions[i] + solutions[n-1]);
-                        if (tempPH < minPH) {
-                            minPH = tempPH;
-                            firstSolution = i;
-                            secondSolution = n-1;
-                        }
-                    }
-                }
-                else {
-                    if (Math.abs(solutions[i] + solutions[-pos -2]) < minPH && i != -pos - 2) {
-                        minPH = Math.abs(solutions[i] + solutions[-pos -2]);
-                        firstSolution = i;
-                        secondSolution = -pos -2;
-                    }
-                    if (Math.abs(solutions[i] + solutions[-pos -1]) < minPH && i != -pos - 1) {
-                        minPH = Math.abs(solutions[i] + solutions[-pos - 1]);
-                        firstSolution = i;
-                        secondSolution = -pos - 1;
-                    }
-                }
+        int minPH = 2000000000;
+        int left = 0, right = n - 1;
+        int firstSolution = 0, secondSolution = n - 1;
+        while (left < right) {
+            int tempPH = solutions[left] + solutions[right];
+            if (Math.abs(tempPH) < minPH) {
+                minPH = Math.abs(tempPH);
+                firstSolution = left;
+                secondSolution = right;
+            }
+            if (tempPH > 0) {
+                right--;
+            }
+            else if (tempPH < 0) {
+                left++;
             }
             else {
-                firstSolution = i;
-                secondSolution = pos;
                 break;
             }
         }
