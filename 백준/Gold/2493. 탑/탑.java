@@ -11,18 +11,20 @@ class Main {
         String[] s = br.readLine().split(" ");
         Stack<Node> stack = new Stack<>();
         stack.push(new Node(0, 0));
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
             int tower = Integer.parseInt(s[i]);
             while (!stack.isEmpty() && stack.peek().number < tower) {
                 stack.pop();
             }
             if (stack.isEmpty()) {
-                System.out.print("0 ");
+                sb.append("0 ");
             } else {
-                System.out.print(stack.peek().pos + " ");
+                sb.append(stack.peek().pos + " ");
             }
             stack.push(new Node(tower, i + 1));
         }
+        System.out.println(sb);
     }
 
     static class Node {
