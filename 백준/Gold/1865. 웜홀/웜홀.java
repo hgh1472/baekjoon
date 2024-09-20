@@ -17,20 +17,15 @@ class Main {
             int e = Integer.parseInt(s[1]);
             int w = Integer.parseInt(s[2]);
 
-            int[][] edges = new int[v + 1][v + 1];
-            for (int i = 1; i <= v; i++) {
-                for (int j = 1; j <= v; j++) {
-                    edges[i][j] = Integer.MAX_VALUE;
-                }
-            }
+            List<Edge> edges = new ArrayList<>();
             for (int i = 0; i < e; i++) {
                 s = br.readLine().split(" ");
                 int v1 = Integer.parseInt(s[0]);
                 int v2 = Integer.parseInt(s[1]);
                 int c = Integer.parseInt(s[2]);
 
-                edges[v1][v2] = Math.min(c, edges[v1][v2]);
-                edges[v2][v1] = Math.min(c, edges[v2][v1]);
+                edges.add(new Edge(v1, v2, c));
+                edges.add(new Edge(v2, v1, c));
             }
 
             for (int i = 0; i < w; i++) {
@@ -38,14 +33,15 @@ class Main {
                 int v1 = Integer.parseInt(s[0]);
                 int v2 = Integer.parseInt(s[1]);
                 int c = Integer.parseInt(s[2]);
-                edges[v1][v2] = -c;
+
+                edges.add(new Edge(v1, v2, -c));
             }
 
             check(v, edges);
         }
     }
 
-    private static void check(int v, int[][] edges) {
+    private static void check(int v, List<Edge> edges) {
         int[] visited = new int[v + 1];
         for (int j = 1; j <= v; j++) {
             visited[j] = 500000000;
@@ -54,26 +50,18 @@ class Main {
         visited[1] = 0;
 
         for (int j = 0; j < v - 1; j++) {
-            for (int k = 1; k <= v; k++) {
-                for (int t = 1; t <= v; t++) {
-                    if (edges[k][t] == Integer.MAX_VALUE)
-                        continue;
-                    int tmp =  visited[k] + edges[k][t];
-                    visited[t] = Math.min(visited[t], tmp);
-                }
+            for (Edge edge : edges) {
+                visited[edge.end] = Math.min(visited[edge.end], visited[edge.start] + edge.cost);
             }
         }
-        for (int i = 1; i <= v; i++) {
-            for (int j = 1; j <= v; j++) {
-                if (edges[i][j] == Integer.MAX_VALUE)
-                    continue;
-                int tmp = visited[i] + edges[i][j];
-                if (tmp < visited[j]) {
-                    System.out.println("YES");
-                    return;
-                }
+
+        for (Edge edge : edges) {
+            if (visited[edge.end] > visited[edge.start] + edge.cost) {
+                System.out.println("YES");
+                return;
             }
         }
+
         System.out.println("NO");
     }
 
@@ -99,10 +87,12 @@ class Main {
     static class Edge {
         int start;
         int end;
+        int cost;
 
-        public Edge(int start, int end) {
+        public Edge(int start, int end, int cost) {
             this.start = start;
             this.end = end;
+            this.cost = cost;
         }
     }
 }
