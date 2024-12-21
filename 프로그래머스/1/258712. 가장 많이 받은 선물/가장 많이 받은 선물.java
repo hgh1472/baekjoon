@@ -1,42 +1,46 @@
 import java.util.*;
+
 class Solution {
     public int solution(String[] friends, String[] gifts) {
-        HashMap<String, Integer> friendKey = new HashMap<>();
+        Map<String, Integer> friendNumbers = new HashMap<>();
+        int[][] giftInfo = new int[friends.length][friends.length];
+        int[] giftOrder = new int[friends.length];
+        int[] result = new int[friends.length];
         for (int i = 0; i < friends.length; i++) {
-            friendKey.put(friends[i], i);
+            friendNumbers.put(friends[i], i);
         }
-        int[][] giftGraph = new int[friends.length][friends.length];
-        int[] giftIndex = new int[friends.length];
         for (String gift : gifts) {
-            String[] person = gift.split(" ");
-            int give = friendKey.get(person[0]);
-            int given = friendKey.get(person[1]);
-            giftGraph[give][given] += 1;
-            giftIndex[give] += 1;
-            giftIndex[given] -= 1;
+            String[] info = gift.split(" ");
+            int a = friendNumbers.get(info[0]);
+            int b = friendNumbers.get(info[1]);
+            giftInfo[a][b] += 1;
+            giftOrder[a] += 1;
+            giftOrder[b] -= 1;
         }
-        int[] giftCount = new int[friends.length];
-        for (int i = 0; i < giftGraph.length; i++) {
-            for (int j = i + 1; j < giftGraph.length; j++) {
-                if (giftGraph[i][j] > giftGraph[j][i]) {
-                    giftCount[i]++;
+        for (int i = 0; i < friends.length; i++) {
+            for (int j = i + 1; j < friends.length; j++) {
+                int a = friendNumbers.get(friends[i]);
+                int b = friendNumbers.get(friends[j]);
+                if (giftInfo[a][b] > giftInfo[b][a]) {
+                    result[a] += 1;
                 }
-                else if (giftGraph[i][j] < giftGraph[j][i]) {
-                    giftCount[j]++;
+                else if (giftInfo[a][b] < giftInfo[b][a]) {
+                    result[b] += 1;
                 }
                 else {
-                    if (giftIndex[i] > giftIndex[j])
-                        giftCount[i]++;
-                    else if (giftIndex[i] < giftIndex[j])
-                        giftCount[j]++;
+                    if (giftOrder[a] > giftOrder[b]) {
+                        result[a] += 1;
+                    }
+                    else if (giftOrder[a] < giftOrder[b]) {
+                        result[b] += 1;
+                    }
                 }
             }
         }
-        int maxGiftCount = 0;
-        for (int i = 0; i < friends.length; i++) {
-            if (maxGiftCount < giftCount[i])
-                maxGiftCount = giftCount[i];
+        int answer = 0;
+        for (int num : result) {
+            answer = Math.max(answer, num);
         }
-        return maxGiftCount;
+        return answer;
     }
 }
