@@ -1,44 +1,61 @@
 import java.util.*;
 
 class Solution {
+    static int[] q1 = new int[600001];
+    static int[] q2 = new int[600001];
+    static int sum1 = 0;
+    static int sum2 = 0;
+    static int front1 = 0;
+    static int rear1 = 0;
+    static int front2 = 0;
+    static int rear2 = 0;
     public int solution(int[] queue1, int[] queue2) {
-        long firstSum = 0;
-        long secondSum = 0;
-        Queue<Integer> firstQueue = new LinkedList<>();
-        Queue<Integer> secondQueue = new LinkedList<>();
-        for (int i = 0; i < queue1.length; i++) {
-            firstQueue.add(queue1[i]);
-            firstSum += queue1[i];
-        }
-        for (int i = 0; i < queue2.length; i++) {
-            secondQueue.add(queue2[i]);
-            secondSum += queue2[i];
-        }
-        if (firstSum == secondSum)
-            return 0;
-        if ((firstSum + secondSum) % 2 == 1)
-            return -1;
-        int count = 0;
-        while (count <= 4 * (queue1.length + queue2.length)) {
-            int num;
-            if (firstSum > secondSum) {
-                num = firstQueue.poll();
-                firstSum -= num;
-                secondQueue.add(num);
-                secondSum += num;
-                count += 1;
+        CustomQueue q1 = new CustomQueue(queue1);
+        CustomQueue q2 = new CustomQueue(queue2);
+        
+        for (int i = 0; i < 600005; i++) {
+            if (q1.sum == q2.sum) {
+                return i;
             }
-            else if (firstSum < secondSum) {
-                num = secondQueue.poll();
-                secondSum -= num;
-                firstQueue.add(num);
-                firstSum += num;
-                count += 1;
+            else if (q1.sum > q2.sum) {
+                int e = q1.pop();
+                q2.push(e);
             }
             else {
-                return count;
+                int e = q2.pop();
+                q1.push(e);
             }
         }
         return -1;
+    }
+    
+    class CustomQueue {
+        int front;
+        int rear;
+        long sum;
+        int[] queue;
+        
+        public CustomQueue(int[] queue) {
+            this.front = 0;
+            this.rear = 0;
+            this.sum = 0L;
+            this.queue = new int[600001];
+            for (int i = 0; i < queue.length; i++) {
+                push(queue[i]);
+            }
+        }
+        
+        public int pop() {
+            int e = queue[this.rear];
+            this.sum -= e;
+            this.rear = (this.rear + 1) % 600001;
+            return e;
+        }
+        
+        public void push(int e) {
+            queue[this.front] = e;
+            this.sum += e;
+            this.front = (this.front + 1) % 600001;
+        }
     }
 }
