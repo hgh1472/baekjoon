@@ -1,59 +1,56 @@
+import java.util.*;
+
 class Solution {
-    static int emoticonCount;
-    static int maxSign = 0;
-    static int maxIncome = 0;
-    static int[][] usersInfo;
-    static int[] emoticonsInfo;
+    static int maxUserCount = 0;
+    static int maxProfit = 0;
+    static int[] emoticonInfo;
+    static int[][] userInfo;
     public int[] solution(int[][] users, int[] emoticons) {
-        emoticonCount = emoticons.length;
-        usersInfo = users;
-        emoticonsInfo = emoticons;
-        int[] rates = new int[emoticonCount];
-        calculate(0, rates);
-        return new int[]{maxSign, maxIncome};
+        emoticonInfo = emoticons;
+        userInfo = users;
+        makeDiscountCombination(new Stack<>());
+        int[] answer = new int[2];
+        answer[0] = maxUserCount;
+        answer[1] = maxProfit;
+        return answer;
     }
     
-    public void calculate(int stack, int[] rates) {
-        if (stack == emoticonCount) {
-            int[] countAndMoney = calculatePerson(rates);
-            int count = countAndMoney[0];
-            int money = countAndMoney[1];
-            if (count > maxSign || (count == maxSign && money > maxIncome)) {
-                maxSign = count;
-                maxIncome = money;
-            }
+    public void makeDiscountCombination(Stack<Integer> discounts) {
+        if (discounts.size() == emoticonInfo.length) {
+            calculate(discounts);
             return;
         }
-        for (int i = 0; i < 5; i++) {
-            rates[stack] = 10 * i;
-            calculate(stack + 1, rates);
+        for (int i = 10; i <= 40; i += 10) {
+            discounts.push(i);
+            makeDiscountCombination(discounts);
+            discounts.pop();
         }
     }
     
-    public int[] calculatePerson(int[] rates) {
-        int count = 0;
-        int income = 0;
-        for (int i = 0; i < usersInfo.length; i++) {
-            int money = 0;
-            for (int j = 0; j < emoticonCount; j++) {
-                if (rates[j] >= usersInfo[i][0])
-                    money += emoticonsInfo[j] - (emoticonsInfo[j] * rates[j] / 100);
+    public void calculate(Stack<Integer> discounts) {
+        int userCount = 0;
+        int profit = 0;
+        for (int i = 0; i < userInfo.length; i++) {
+            int price = 0;
+            int buyCondition = userInfo[i][0];
+            int plusCondition = userInfo[i][1];
+            for (int j = 0; j < emoticonInfo.length; j++) {
+                if (discounts.get(j) < buyCondition) continue;
+                price += emoticonInfo[j] * (100 - discounts.get(j)) / 100;
             }
-            if (money >= usersInfo[i][1])
-                count++;
+            if (price >= plusCondition) {
+                userCount += 1;
+            }
             else {
-                income += money;
+                profit += price;
             }
         }
-        return new int[]{count, income};
+        if (maxUserCount < userCount) {
+            maxUserCount = userCount;
+            maxProfit = profit;
+        }
+        else if (maxUserCount == userCount && maxProfit < profit) {
+            maxProfit = profit;
+        }
     }
 }
-
-// 9300
-// 40% => 930 * 4 = 3720 9300 - 3720 = 5280
-// 32% => 6324
-// 11% => 
-// 40,2900 / 11,5200 / 5,5900 / 40, 3100
-// 40% 3개 => 4620
-// 20% 1600 => 1280
-// 1. 할인했을 때 가능한것 뽑기
