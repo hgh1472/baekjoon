@@ -1,36 +1,62 @@
+import java.util.*;
+
 class Solution {
+    static int endX;
+    static int endY;
+    static int nowX;
+    static int nowY;
     public String solution(int n, int m, int x, int y, int r, int c, int k) {
-        if (Math.abs(x - r) + Math.abs(y - c) > k || (k - (Math.abs(x - r) + Math.abs(y - c))) % 2 == 1)
-            return "impossible";
-        int count = 0;
+        endX = r;
+        endY = c;
+        nowX = x;
+        nowY = y;
         StringBuilder sb = new StringBuilder();
-        while (x < n && count + Math.abs(x - r) + Math.abs(y - c) + 2 <= k) {
-            x++;
-            sb.append("d");
-            count++;
+        int minDistance = Math.abs(x - r) + Math.abs(y - c);
+        if (minDistance > k || (k - minDistance) % 2 == 1) return "impossible";
+        while (!isEnd(k)) {
+            if (nowX < n) {
+                nowX += 1;
+                sb.append("d");
+            }
+            else if (1 < nowY) {
+                nowY -= 1;
+                sb.append("l");
+            }
+            else if (nowY < m) {
+                nowY += 1;
+                sb.append("r");
+            }
+            else {
+                nowX -= 1;
+                sb.append("u");
+            }
+            k--;
         }
-        while (y > 1 &&  count + Math.abs(x - r) + Math.abs(y - c) + 2 <= k) {
-            y--;
-            count++;
+        
+        while (nowX < endX) {
+            nowX += 1;
+            sb.append("d");
+        }
+        while (nowY > endY) {
+            nowY -= 1;
             sb.append("l");
         }
-        while (count + Math.abs(x - r) + Math.abs(y - c) + 2 <= k) {
-            count += 2;
-            sb.append("rl");
+        while (nowY < endY) {
+            nowY += 1;
+            sb.append("r");
         }
-        if (x - r < 0) {
-            sb.append("d".repeat(Math.abs(x-r)));
+        while (nowX > endX) {
+            nowX -= 1;
+            sb.append("u");
         }
-        if (c - y < 0) {
-            sb.append("l".repeat(Math.abs(c-y)));
-        }
-        if (c - y > 0) {
-            sb.append("r".repeat(c-y));
-        }
-        if (x - r > 0) {
-            sb.append("u".repeat(x-r));
-        }
+        
         return sb.toString();
     }
+    
+    public boolean isEnd(int k) {
+        if (Math.abs(endX - nowX) + Math.abs(endY - nowY) == k) {
+            return true;
+        }
+        return false;
+    }
 }
-
