@@ -1,64 +1,55 @@
+import java.util.*;
+
 class Solution {
-    static boolean[] isPossible;
     public int[] solution(long[] numbers) {
         int[] answer = new int[numbers.length];
-        isPossible = new boolean[numbers.length];
-        for (int i = 0; i < numbers.length; i++)
-            isPossible[i] = true;
-        for (int i = 0; i < numbers.length; i++) {
-            String binary = makeBinary(numbers[i]);
-            validateBinary(binary, 0, binary.length() - 1, i);
-            if (isPossible[i])
-                answer[i] = 1;
+        int idx = 0;
+        for (long number : numbers) {
+            String binary = calculateBinary(number);
+            int lastDepth = 0;
+            while (!(Math.pow(2, lastDepth) <= binary.length() && binary.length() < Math.pow(2, lastDepth + 1)))
+                lastDepth++;
+            boolean result = dfs(binary, 0, binary.length() - 1, 0, lastDepth, false);
+            if (result)
+                answer[idx++] = 1;
+            else
+                answer[idx++] = 0;
         }
+        
         return answer;
     }
     
-    public void validateBinary(String s, int left, int right, int stringIndex) {
-        if (left >= right)
-            return;
+    public boolean dfs(String binary, int left, int right, int depth, int lastDepth, boolean isZero) {
+        if (depth > lastDepth)
+            return true;
         int mid = (left + right) / 2;
-        int leftChild = (left + mid - 1) / 2;
-        int rightChild = (mid + 1 + right) / 2;
-        if (s.charAt(mid) == '0') {
-            if (s.charAt(leftChild) == '1' || s.charAt(rightChild) == '1') {
-                isPossible[stringIndex] = false;
-                return;
-            }
+        if (binary.charAt(mid) == '1' && isZero) {
+            return false;
         }
-        validateBinary(s, left, mid - 1, stringIndex);
-        validateBinary(s, mid + 1, right, stringIndex);
+        boolean next = binary.charAt(mid) == '0';
+        if (!dfs(binary, left, mid - 1, depth + 1, lastDepth, next))
+            return false;
+        return dfs(binary, mid + 1, right, depth + 1, lastDepth, next);
     }
     
-    public String makeBinary(long number) {
+    public String calculateBinary(long number) {
         StringBuilder sb = new StringBuilder();
-        while (number > 0) {
-            sb.insert(0, number % 2);
+        while (number != 0) {
+            sb.append(number % 2);
             number /= 2;
         }
-        int n = 1;
-        while (true) {
-            if (sb.length() == Math.pow(2, n) - 1)
-                break;
-            else if (Math.pow(2, n) - 1 < sb.length() && sb.length() < Math.pow(2, n+1) - 1) {
-                int d = (int) Math.pow(2, n+1) - 1 - sb.length();
-                for (int i = 0; i < d; i++)
-                    sb.insert(0, "0");
-                break;
-            }
-            n++;
+        fillDummy(sb);
+        return sb.reverse().toString();
+    }
+    
+    public void fillDummy(StringBuilder sb) {
+        int length = sb.length();
+        int count = 0;
+        while (!(Math.pow(2, count) <= length && length < Math.pow(2, count + 1))) {
+            count += 1;
         }
-        return sb.toString();
+        for (int i = length; i < Math.pow(2, count + 1) - 1; i++) {
+            sb.append("0");
+        }
     }
 }
-// 64 + 
-// 1011111 X
-// 1101111 O
-// 0111111 O
-
-// 111 O
-// 0101010 O
-// 101 X
-// 1111
-// 0001111
-// 2^n - 1개
