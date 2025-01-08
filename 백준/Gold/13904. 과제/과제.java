@@ -1,45 +1,33 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.PriorityQueue;
 
 class Main {
-    static int[][] dp;
-    static List<Homework> homeworks;
+    static PriorityQueue<Homework> homeworks;
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int n = Integer.parseInt(br.readLine());
-        dp = new int[n+1][n+1];
-        homeworks = new ArrayList<>();
+        homeworks = new PriorityQueue<>();
         for (int i = 1; i <= n; i++) {
             int[] input = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
             homeworks.add(new Homework(input[0], input[1]));
         }
 
-        Collections.sort(homeworks);
-
-        for (int i = 1; i <= n; i++) {
-            dp[i][1] = Math.max(dp[i-1][1], homeworks.get(i-1).reward);
-            for (int j = 2; j <= n; j++) {
-                if (j > homeworks.get(i-1).day) {
-                    dp[i][j] = Math.max(dp[i][j-1], dp[i-1][j]);
-                    continue;
+        int[] answer = new int[1001];
+        while (!homeworks.isEmpty()) {
+            Homework homework = homeworks.poll();
+            for (int i = homework.day; i > 0; i--) {
+                if (answer[i] < homework.reward) {
+                    answer[i] = homework.reward;
+                    break;
                 }
-                dp[i][j] = Math.max(dp[i-1][j], dp[i-1][j-1] + homeworks.get(i-1).reward);
             }
         }
-
-//        for (int[] ints : dp) {
-//            for (int anInt : ints) {
-//                System.out.print(anInt + " ");
-//            }
-//            System.out.println();
-//        }
-        System.out.println(dp[n][n]);
+        System.out.println(Arrays.stream(answer).sum());
     }
 
     static class Homework implements Comparable<Homework> {
@@ -53,10 +41,7 @@ class Main {
 
         @Override
         public int compareTo(Homework o) {
-            if (this.day == o.day) {
-                return this.reward - o.reward;
-            }
-            return this.day - o.day;
+            return o.reward - this.reward;
         }
     }
 }
