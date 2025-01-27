@@ -8,7 +8,7 @@ public class Main {
     static int k;
     static int answer = 0;
     static String[] words;
-    static Map<String, Boolean> visited = new HashMap<>();
+    static boolean[] visited = new boolean[26];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -22,18 +22,18 @@ public class Main {
         }
 
         for (int i = 0; i < 26; i++) {
-            visited.put(String.valueOf((char) ('a' + i)), false);
+            visited[i] = false;
         }
 
         if (k < 5) {
             System.out.println(0);
             return;
         }
-        visited.put("a", true);
-        visited.put("n", true);
-        visited.put("t", true);
-        visited.put("i", true);
-        visited.put("c", true);
+        visited['a' - 'a'] = true;
+        visited['n' - 'a'] = true;
+        visited['t' - 'a'] = true;
+        visited['i' - 'a'] = true;
+        visited['c' - 'a'] = true;
 
         combination(0, k - 5, 0);
         System.out.println(answer);
@@ -46,13 +46,12 @@ public class Main {
         }
 
         for (int i = last; i < 26; i++) {
-            String target = String.valueOf((char) ('a' + i));
-            if (visited.get(target)) {
+            if (visited[i]) {
                 continue;
             }
-            visited.put(target, true);
+            visited[i] = true;
             combination(d + 1, f, i + 1);
-            visited.put(target, false);
+            visited[i] = false;
         }
     }
 
@@ -61,7 +60,7 @@ public class Main {
         for (int i = 0; i < n; i++) {
             boolean isPossible = true;
             for (int j = 0; j < words[i].length(); j++) {
-                if (!visited.get(String.valueOf(words[i].charAt(j)))) {
+                if (!visited[words[i].charAt(j) - 'a']) {
                     isPossible = false;
                     break;
                 }
