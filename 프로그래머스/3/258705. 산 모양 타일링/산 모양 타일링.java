@@ -1,14 +1,14 @@
 import java.util.*;
 class Solution {
     public int solution(int n, int[] tops) {
-        int[] connectDp = new int[n];
+        int[] connectedDp = new int[n];
         int[] separateDp = new int[n];
-        connectDp[0] = 1;
+        connectedDp[0] = 1;
         separateDp[0] = 2 + tops[0];
         for (int i = 1; i < n; i++) {
-            connectDp[i] = (connectDp[i-1] + separateDp[i-1]) % 10007;
-            separateDp[i] = (connectDp[i-1] * (1+tops[i]) + separateDp[i-1] * (2+tops[i])) % 10007;
+            connectedDp[i] = (connectedDp[i-1] + separateDp[i-1]) % 10007;
+            separateDp[i] = ((1 + tops[i]) * connectedDp[i-1] + (2  +tops[i]) * separateDp[i-1]) % 10007;
         }
-        return (connectDp[n-1] + separateDp[n-1]) % 10007;
+        return (connectedDp[n-1] + separateDp[n-1]) % 10007;
     }
 }
