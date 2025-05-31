@@ -3,8 +3,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
+/**
+ * 최대로 덮을 수 있는 트램펄린의 여러 케이스 중에서 왼쪽 꼭짓점(x,y)가 최대로 될 수 있는 하나의 케이스만 생각
+ * => 왼쪽면, 위쪽면은 각각 최소 1개의 별이 존재 (같을 수도 있음)
+ * 2개의 별, 별1, 별2를 뽑음. 그 다음 별1이 왼쪽면, 별2가 위쪽면에 접해있다고 가정하고 계산. 이 과정에서 최대로 덮을 수 있는 케이스가 나온다.
+ */
 public class Main {
-
+    
     static int n, m;
     static List<Star> stars = new ArrayList<>();
     public static void main(String[] args) throws IOException {
