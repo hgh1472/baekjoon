@@ -8,11 +8,19 @@ class Solution {
             String[] info = musicInfo.split(",");
             int playTime = getPlayTime(info[0], info[1]);
             
-            List<String> musicNotes = parseNotes(info[3]);
+            String music = parseNotes(info[3]);
+            if (playTime < music.length()) {
+                music = music.substring(0, playTime);
+            }
+            else {
+                int length = music.length();
+                String add = music.substring(0, playTime % length);
+                music = music.repeat(playTime / music.length()).concat(add);
+            }
             
-            List<String> hearNotes = parseNotes(m);
-            
-            if (isContain(hearNotes, musicNotes, playTime) && longestTime < playTime) {
+            String hear = parseNotes(m);
+ 
+            if (music.contains(hear) && longestTime < playTime) {
                 answer = info[2];
                 longestTime = playTime;
             }
@@ -29,17 +37,15 @@ class Solution {
         return result;
     }
     
-    private List<String> parseNotes(String str) {
-        List<String> notes = new ArrayList<>();
-        for (int i = 0; i < str.length(); i++) {
-            String note = String.valueOf(str.charAt(i));
-            if (i + 1 < str.length() && str.charAt(i+1) == '#') {
-                note = note + str.charAt(i+1);
-                i++;
-            }
-            notes.add(String.valueOf(note));
-        }
-        return notes;
+    String parseNotes(String str) {
+        str = str.replaceAll("C#", "c");
+        str = str.replaceAll("D#", "d");
+        str = str.replaceAll("F#", "f");
+        str = str.replaceAll("G#", "g");
+        str = str.replaceAll("A#", "a");
+        str = str.replaceAll("E#", "e");
+        str = str.replaceAll("B#", "b");
+        return str;
     }
     
     private boolean isContain(List<String> hearNotes, List<String> musicNotes, int playTime) {
@@ -65,6 +71,3 @@ class Solution {
         return false;
     }
 }
-/**
-m, info = "CDCDF", ["13:50,14:02,WORLD,CDCDCDF"]
-*/
