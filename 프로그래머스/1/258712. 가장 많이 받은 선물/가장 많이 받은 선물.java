@@ -2,44 +2,51 @@ import java.util.*;
 
 class Solution {
     public int solution(String[] friends, String[] gifts) {
-        Map<String, Integer> friendNumbers = new HashMap<>();
-        int[][] giftInfo = new int[friends.length][friends.length];
-        int[] giftOrder = new int[friends.length];
-        int[] result = new int[friends.length];
+        Map<String, Integer> map = new HashMap<>();
         for (int i = 0; i < friends.length; i++) {
-            friendNumbers.put(friends[i], i);
+            map.put(friends[i], i);
         }
+        
+        int[][] info = new int[friends.length][friends.length];
+        
+        int[] numbers = new int[friends.length];
+        
         for (String gift : gifts) {
-            String[] info = gift.split(" ");
-            int a = friendNumbers.get(info[0]);
-            int b = friendNumbers.get(info[1]);
-            giftInfo[a][b] += 1;
-            giftOrder[a] += 1;
-            giftOrder[b] -= 1;
+            String[] split = gift.split(" ");
+            int num1 = map.get(split[0]);
+            int num2 = map.get(split[1]);
+            info[num1][num2]++;
+            numbers[num1]++;
+            numbers[num2]--;
         }
-        for (int i = 0; i < friends.length; i++) {
-            for (int j = i + 1; j < friends.length; j++) {
-                int a = friendNumbers.get(friends[i]);
-                int b = friendNumbers.get(friends[j]);
-                if (giftInfo[a][b] > giftInfo[b][a]) {
-                    result[a] += 1;
+        
+        int[] result = new int[friends.length];
+        
+        for (int i = 0; i < info.length; i++) {
+            for (int j = i; j < info.length; j++) {
+                if (i == j) {
+                    continue;
                 }
-                else if (giftInfo[a][b] < giftInfo[b][a]) {
-                    result[b] += 1;
+                if (info[i][j] > info[j][i]) {
+                    result[i]++;
+                }
+                else if (info[i][j] < info[j][i]) {
+                    result[j]++;
                 }
                 else {
-                    if (giftOrder[a] > giftOrder[b]) {
-                        result[a] += 1;
+                    if (numbers[i] > numbers[j]) {
+                        result[i]++;
                     }
-                    else if (giftOrder[a] < giftOrder[b]) {
-                        result[b] += 1;
+                    else if (numbers[i] < numbers[j]) {
+                        result[j]++;
                     }
                 }
             }
         }
+        
         int answer = 0;
-        for (int num : result) {
-            answer = Math.max(answer, num);
+        for (int i = 0; i < result.length; i++) {
+            answer = Math.max(answer, result[i]);
         }
         return answer;
     }
