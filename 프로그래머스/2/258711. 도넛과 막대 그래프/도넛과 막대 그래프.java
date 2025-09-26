@@ -1,47 +1,61 @@
 import java.util.*;
 
 class Solution {
-    int[] answer = new int[4];
-    HashMap<Integer, List<Integer>> graph = new HashMap<Integer, List<Integer>>();
-    int[] out = new int[1000001];
     public int[] solution(int[][] edges) {
+        Map<Integer, Node> map = new HashMap<>();
+        
         for (int[] edge : edges) {
-            if (!graph.containsKey(edge[0])) {
-                graph.put(edge[0], new ArrayList<>());
+            if (!map.containsKey(edge[0])) {
+                map.put(edge[0], new Node(edge[0]));
             }
-            if (!graph.containsKey(edge[1])) {
-                graph.put(edge[1], new ArrayList<>());
+            if (!map.containsKey(edge[1])) {
+                map.put(edge[1], new Node(edge[1]));
             }
-            
-            graph.get(edge[0]).add(edge[1]);
-            out[edge[1]] += 1;
+            map.get(edge[0]).outs.add(map.get(edge[1]));
+            map.get(edge[1]).ins.add(map.get(edge[0]));
         }
         
-        // 시작점 찾기 => 들어오는 간선 X, 나가는 간선 2개 이상
-        for (Integer i : graph.keySet()) {
-            if (out[i] == 0 && graph.get(i).size() >= 2) {
-                answer[0] = i;
+        int start = 0;
+        int graphCount = 0;
+        for (Integer key : map.keySet()) {
+            Node node = map.get(key);
+            if (node.ins.size() == 0 && node.outs.size() >= 2) {
+                start = key;
+                for (Node out : node.outs) {
+                    out.ins.remove(node);
+                    graphCount++;
+                }
+                start = key;
                 break;
             }
         }
         
-        // 막대 그래프 찾기 => 나가는 간선이 0인 정점 개수 => out 체크
-        // 나가는 간선은 그래프에 저장 X
-        for (Integer i : graph.keySet()) {
-            if (graph.get(i).size() == 0) {
-                answer[2]++;
+        int barCount = 0;
+        int eightCount = 0;
+        for (Integer key : map.keySet()) {
+            Node node = map.get(key);
+            if (node.outs.size() == 2 && node.ins.size() == 2) {
+                eightCount++;
+            }
+            if (node.outs.size() == 1 && node.ins.size() == 0) {
+                barCount++;
+            }
+            if (node.outs.size() == 0 && node.ins.size() == 0) {
+                barCount++;
             }
         }
         
-        // 8자 그래프 찾기 => 들어오는 간선이 존재하고, 나가는 간선이 2개인 정점 개수
-        for (Integer i : graph.keySet()) {
-            if (i == answer[0])
-                continue;
-            if (graph.get(i).size() == 2)
-                answer[3]++;
-        }
-                
-        answer[1] = graph.get(answer[0]).size() - answer[2] - answer[3];
+        int[] answer = {start, graphCount - barCount - eightCount, barCount, eightCount};
         return answer;
+    }
+    
+    class Node {
+        int number;
+        List<Node> outs = new ArrayList<>();
+        List<Node> ins = new ArrayList<>();
+        
+        Node(int number) {
+            this.number = number;
+        }
     }
 }
