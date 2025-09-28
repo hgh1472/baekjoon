@@ -1,56 +1,63 @@
-import java.util.*;
-
 class Solution {
-    static int maxUserCount = 0;
-    static int maxProfit = 0;
-    static int[] emoticonInfo;
-    static int[][] userInfo;
+    int maxCount;
+    int maxSales;
+    
     public int[] solution(int[][] users, int[] emoticons) {
-        emoticonInfo = emoticons;
-        userInfo = users;
-        makeDiscountCombination(new Stack<>());
-        int[] answer = new int[2];
-        answer[0] = maxUserCount;
-        answer[1] = maxProfit;
+        maxCount = 0;
+        maxSales = 0;
+        combination(0, new int[emoticons.length], users, emoticons);
+        int[] answer = {maxCount, maxSales};
         return answer;
     }
     
-    public void makeDiscountCombination(Stack<Integer> discounts) {
-        if (discounts.size() == emoticonInfo.length) {
-            calculate(discounts);
+    public void combination(int count, int[] discounts, int[][] users, int[] emoticions) {
+        if (count == emoticions.length) {
+            calculate(discounts, users, emoticions);
             return;
         }
         for (int i = 10; i <= 40; i += 10) {
-            discounts.push(i);
-            makeDiscountCombination(discounts);
-            discounts.pop();
+            discounts[count] = i;
+            combination(count+1, discounts, users, emoticions);
         }
     }
     
-    public void calculate(Stack<Integer> discounts) {
-        int userCount = 0;
-        int profit = 0;
-        for (int i = 0; i < userInfo.length; i++) {
-            int price = 0;
-            int buyCondition = userInfo[i][0];
-            int plusCondition = userInfo[i][1];
-            for (int j = 0; j < emoticonInfo.length; j++) {
-                if (discounts.get(j) < buyCondition) continue;
-                price += emoticonInfo[j] * (100 - discounts.get(j)) / 100;
+    public void calculate(int[] discounts, int[][] users, int[] emoticions) {
+        int[] prices = new int[emoticions.length];
+        for (int i = 0; i < emoticions.length; i++) {
+            prices[i] = emoticions[i] * (100 - discounts[i]) / 100;
+        }
+        
+        int count = 0;
+        int sales = 0;
+        for (int i = 0; i < users.length; i++) {
+            int sum = 0;
+            for (int j = 0; j < emoticions.length; j++) {
+                if (users[i][0] <= discounts[j]) {
+                    sum += prices[j];
+                }
             }
-            if (price >= plusCondition) {
-                userCount += 1;
+            if (sum >= users[i][1]) {
+                count++;
             }
             else {
-                profit += price;
+                sales += sum;
             }
         }
-        if (maxUserCount < userCount) {
-            maxUserCount = userCount;
-            maxProfit = profit;
+        
+        if (maxCount < count) {
+            maxCount = count;
+            maxSales = sales;
         }
-        else if (maxUserCount == userCount && maxProfit < profit) {
-            maxProfit = profit;
+        else if (maxCount == count && maxSales < sales) {
+            maxSales = sales;
         }
     }
+    
+    /**
+    1. 가입자가 최대 -> 각 이모티콘을 구매하려면 최소 비율 이상 
+    (사용자 할인율, 금액) 할인율을 더 높이면 금액이 낮아짐 -> 안살 수도 있음
+    할인율 40으로 시작 -> 40이면 사는데, 안사는 사람이 생길수도있음
+    
+    2. 판매액 최대
+    */
 }
