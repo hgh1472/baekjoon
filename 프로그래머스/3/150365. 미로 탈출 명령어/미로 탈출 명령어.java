@@ -1,121 +1,55 @@
-import java.util.*;
-
 class Solution {
-    
+    private static final int[] dr = {1, 0, 0, -1};  // d, l, r, u
+    private static final int[] dc = {0, -1, 1, 0};
+    private static final String[] dir = {"d", "l", "r", "u"};
+
+    String answer = "impossible";
+    int N, M, K;
+
     public String solution(int n, int m, int x, int y, int r, int c, int k) {
-        int ud = x - r;
-        int lr = y - c;
-        PriorityQueue<Move> q = new PriorityQueue<>();
-        if (ud < 0) {
-            for (int i = 0; i > ud; i--) {
-                q.add(new Move(1, 0, 'd'));
-            }
-        }
-        if (lr > 0) {
-            for (int i = 0; i < lr; i++) {
-                q.add(new Move(0, -1, 'l'));
-            }
-        }
-        if (lr < 0) {
-            for (int i = 0; i > lr; i--) {
-                q.add(new Move(0, 1, 'r'));
-            }
-        }
-        if (ud > 0) {
-            for (int i = 0; i < ud; i++) {
-                q.add(new Move(-1, 0, 'u'));
-            }
-        }
-        
-        int count = Math.abs(ud) + Math.abs(lr);
-        if (k - count < 0) {
+        N = n;
+        M = m;
+        K = k;
+
+        int minDist = Math.abs(r - x) + Math.abs(c - y);
+
+        // 1. 도달 불가능한 경우 가지치기
+        if (minDist > k || (k - minDist) % 2 != 0) {
             return "impossible";
         }
-        if ((k - count) % 2 != 0) {
-            return "impossible";
-        }
-        
-        int add = (k - count) / 2;
-        StringBuilder sb = new StringBuilder();
-        int idx = 0;
-        int nx = x;
-        int ny = y;
-        while (0 < k) {
-            if (add == 0) {
-                Move move = q.poll();
-                sb.append(move.c);
-                nx += move.dx;
-                ny += move.dy;
-            }
-            else {
-                Move move = getMovable(nx, ny, n, m);
-                Move peek = q.peek();
-                if (peek == null) {
-                    q.add(move.getOpposite());
-                    nx += move.dx;
-                    ny += move.dy;
-                    sb.append(move.c);
-                    add--;
-                }
-                else if (move.compareTo(peek) < 0) {
-                    q.add(move.getOpposite());
-                    nx += move.dx;
-                    ny += move.dy;
-                    sb.append(move.c);
-                    add--;
-                }
-                else {
-                    q.poll();
-                    nx += peek.dx;
-                    ny += peek.dy;
-                    sb.append(peek.c);
-                }
-            }
-            k--;
-        }
-        
-        return sb.toString();
+
+        // 2. DFS 탐색 시작
+        dfs(x, y, r, c, 0, "");
+
+        return answer;
     }
-    
-    Move getMovable(int nx, int ny, int n, int m) {
-        if (nx < n) {
-            return new Move(1, 0, 'd');
-        }
-        if (1 < ny) {
-            return new Move(0, -1, 'l');
-        }
-        if (ny < n) {
-            return new Move(0, 1, 'r');
-        }
-        return new Move(-1, 0, 'u');
-    }
-    
-    class Move implements Comparable<Move> {
-        int dx, dy;
-        char c;
-        
-        Move(int dx, int dy, char c) {
-            this.dx = dx;
-            this.dy = dy;
-            this.c = c;
-        }
-        
-        @Override
-        public int compareTo(Move m) {
-            return this.c - m.c;
-        }
-        
-        public Move getOpposite() {
-            if (this.c == 'd') {
-                return new Move(-1, 0, 'u');
+
+    private void dfs(int row, int col, int r, int c, int moveCnt, String path) {
+        // 3. 정답을 찾으면 더 이상 탐색할 필요 없음 (가지치기)
+        if (!answer.equals("impossible")) return;
+
+        // 4. 정확히 k번 이동 후 목적지 도착 시 정답 갱신
+        if (moveCnt == K) {
+            if (row == r && col == c) {
+                answer = path;
             }
-            if (this.c == 'l') {
-                return new Move(0, 1, 'r');
+            return;
+        }
+
+        // 5. 현재 이동 횟수 + 남은 최소 거리 > k면 탐색 중단 (가지치기)
+        int remainingMoves = K - moveCnt;
+        int minDistToEnd = Math.abs(r - row) + Math.abs(c - col);
+        if (remainingMoves < minDistToEnd) return;
+
+        // 6. d → l → r → u 순서로 탐색 (사전순)
+        for (int i = 0; i < 4; i++) {
+            int nr = row + dr[i];
+            int nc = col + dc[i];
+
+            // 7. 격자 범위를 벗어나지 않는 경우에만 탐색
+            if (nr >= 1 && nr <= N && nc >= 1 && nc <= M) {
+                dfs(nr, nc, r, c, moveCnt + 1, path + dir[i]);
             }
-            if (this.c == 'r') {
-                return new Move(0, -1, 'l');
-            }
-            return new Move(1, 0, 'd');
         }
     }
 }

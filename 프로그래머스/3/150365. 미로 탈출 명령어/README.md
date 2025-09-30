@@ -1,10 +1,10 @@
 # [level 3] 미로 탈출 명령어 - 150365 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/150365) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/150365#qna) 
 
 ### 성능 요약
 
-메모리: 80.2 MB, 시간: 13.95 ms
+메모리: 79.6 MB, 시간: 15.76 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 09월 30일 10:49:44
+2025년 09월 30일 11:43:10
 
 ### 문제 설명
 
