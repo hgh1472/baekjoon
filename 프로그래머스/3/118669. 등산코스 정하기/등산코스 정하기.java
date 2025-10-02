@@ -1,89 +1,103 @@
 import java.util.*;
+
 class Solution {
-    static int[] maxIntensity;
-    static int number;
-    static HashSet<Integer> gateSet = new HashSet<>();
-    static HashSet<Integer> summitSet = new HashSet<>();
-    static List<List<Edge>> graph = new ArrayList<>();
     public int[] solution(int n, int[][] paths, int[] gates, int[] summits) {
-        maxIntensity = new int[n + 1];
-        for (int i = 0; i <= n; i++) {
-            graph.add(new ArrayList<Edge>());
+        Vertex[] vertices = new Vertex[n+1];
+        for (int i = 1; i <= n; i++) {
+            vertices[i] = new Vertex(i);
         }
-        for (int gate : gates)
-            gateSet.add(gate);
         
-        for (int summit : summits)
-            summitSet.add(summit);
         for (int[] path : paths) {
-            graph.get(path[0]).add(new Edge(path[1], path[2]));
-            graph.get(path[1]).add(new Edge(path[0], path[2]));
+            vertices[path[0]].add(new Edge(path[1], path[2]));
+            vertices[path[1]].add(new Edge(path[0], path[2]));
         }
-        number = n;
-        // info에 정보 저장
-        Arrays.sort(summits);
-        int finalIntensity = 10000001;
-        for (int i = 1; i <= n; i++){
-            if (gateSet.contains(i))
-                maxIntensity[i] = 0;
-            else
-                maxIntensity[i] = 10000001;
+        
+        for (int gate : gates) {
+            vertices[gate].isGate = true;
         }
-        int finalSummit = 0;
-        dijkstra(paths);
+        
         for (int summit : summits) {
-            if (maxIntensity[summit] < finalIntensity) {
-                finalIntensity = maxIntensity[summit];
-                finalSummit = summit;
+            vertices[summit].isSummit = true;
+        }
+
+        int minIntensity = Integer.MAX_VALUE;
+        int result = 0;
+        Arrays.sort(summits);
+        for (int summit : summits) {
+            PriorityQueue<Node> q = new PriorityQueue<>();
+            q.add(new Node(summit, 0));
+            while (!q.isEmpty()) {
+                Node poll = q.poll();
+                if (vertices[poll.number].intensity <= poll.intensity) {
+                    continue;
+                }
+                if (vertices[poll.number].isGate) {
+                    if (minIntensity > poll.intensity) {
+                        minIntensity = poll.intensity;
+                        result = summit;
+                    }
+                    break;
+                }
+                vertices[poll.number].intensity = poll.intensity;
+                for (Edge edge : vertices[poll.number].edges) {
+                    if (vertices[edge.dst].isSummit) {
+                        continue;
+                    }
+                    int next = Math.max(poll.intensity, edge.intensity);
+                    if (vertices[edge.dst].intensity > next) {
+                        q.add(new Node(edge.dst, next));
+                    }
+                }
             }
         }
-        return new int[]{finalSummit, finalIntensity};
+        
+        return new int[]{result, minIntensity};
     }
     
-    public void dijkstra(int[][] paths) {
-        PriorityQueue<Node> q = new PriorityQueue<>();
-        for (Integer i : gateSet)
-            q.add(new Node(i, 0));
-        while (!q.isEmpty()) {
-            Node node = q.poll();
-            if (summitSet.contains(node.num) || maxIntensity[node.num] < node.intensity)
-                continue;
-            List<Edge> edges = graph.get(node.num);
-            for (Edge edge : edges) {
-                if (gateSet.contains(edge.dst))
-                    continue;
-                int intensity = Math.max(node.intensity, edge.weight);
-                if (maxIntensity[edge.dst] <= intensity)
-                    continue;
-                maxIntensity[edge.dst] = intensity;
-                q.add(new Node(edge.dst, intensity));
-            }
+    class Vertex {
+        int number;
+        List<Edge> edges = new ArrayList<>();
+        int intensity;
+        boolean isGate;
+        boolean isSummit;
+        
+        Vertex(int number) {
+            this.number = number;
+            this.intensity = Integer.MAX_VALUE;
+            this.isGate = false;
+            this.isSummit = false;
+        }
+        
+        void add(Edge e) {
+            this.edges.add(e);
+        }
+    }
+    
+    class Edge {
+        int dst;
+        int intensity;
+        
+        Edge(int dst, int intensity) {
+            this.dst = dst;
+            this.intensity = intensity;
         }
     }
     
     class Node implements Comparable<Node> {
-        int num;
+        int number;
         int intensity;
         
-        public Node(int num, int intensity) {
-            this.num = num;
+        Node(int number, int intensity) {
+            this.number = number;
             this.intensity = intensity;
         }
         
-        public int compareTo(Node o) {
-            int n = this.intensity - o.intensity;
-            if (n == 0)
-                return Integer.compare(this.num, o.intensity);
-            return Integer.compare(this.intensity, o.intensity);
-        }
-    }
-    class Edge {
-        int dst;
-        int weight;
-        
-        public Edge(int dst, int weight) {
-            this.dst = dst;
-            this.weight = weight;
+        @Override
+        public int compareTo(Node n) {
+            if (this.intensity != n.intensity) {
+                return this.intensity - n.intensity;
+            }
+            return this.number - n.number;
         }
     }
 }
