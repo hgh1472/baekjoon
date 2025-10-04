@@ -1,45 +1,44 @@
 class Solution {
     public int solution(int[][] board, int[][] skill) {
-        int[][] temp = new int[board.length + 1][board[0].length + 1];
-        
-        for (int i = 0; i < skill.length; i++) {
-            if (skill[i][0] == 1) {
-                temp[skill[i][1]][skill[i][2]] -= skill[i][5];
-                temp[skill[i][3] + 1][skill[i][2]] += skill[i][5];
-                temp[skill[i][1]][skill[i][4] + 1] += skill[i][5];
-                temp[skill[i][3] + 1][skill[i][4] + 1] -= skill[i][5];
+        int[][] sums = new int[board.length][board[0].length];
+        for (int[] s : skill) {
+            int add = (s[0] == 1) ? -s[5] : s[5];
+            sums[s[1]][s[2]] += add;
+            if (s[3] + 1 < board.length) {
+                sums[s[3]+1][s[2]] -= add;
             }
-            else {
-                temp[skill[i][1]][skill[i][2]] += skill[i][5];
-                temp[skill[i][3] + 1][skill[i][2]] -= skill[i][5];
-                temp[skill[i][1]][skill[i][4] + 1] -= skill[i][5];
-                temp[skill[i][3] + 1][skill[i][4] + 1] += skill[i][5];
+            if (s[4] + 1 < board[0].length) {
+                sums[s[1]][s[4]+1] -= add;
+            }
+            if (s[3] + 1 < board.length && s[4] + 1 < board[0].length) {
+                sums[s[3]+1][s[4]+1] += add;
             }
         }
         
-        for (int i = 0; i < temp[0].length; i++) {
-            int sum = temp[0][i];
-            for (int j = 1; j < temp.length; j++) {
-                sum += temp[j][i];
-                temp[j][i] = sum;
-            }
-        }
-        for (int i = 0; i < temp.length; i++) {
-            int sum = temp[i][0];
-            for (int j = 1; j < temp[i].length; j++) {
-                sum += temp[i][j];
-                temp[i][j] = sum;
-            }
-        }
-        
-        int count = 0;
         for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                board[i][j] += temp[i][j];
-                if (board[i][j] >= 1) count++;
+            int sum = sums[i][0];
+            for (int j = 1; j < board[0].length; j++) {
+                sum += sums[i][j];
+                sums[i][j] = sum;
             }
         }
         
-        return count;
+        for (int i = 0; i < board[0].length; i++) {
+            int sum = sums[0][i];
+            for (int j = 1; j < board.length; j++) {
+                sum += sums[j][i];
+                sums[j][i] = sum;
+            }
+        }
+        
+        int answer = 0;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j] + sums[i][j] > 0) {
+                    answer++;
+                }
+            }
+        }
+        return answer;
     }
 }
