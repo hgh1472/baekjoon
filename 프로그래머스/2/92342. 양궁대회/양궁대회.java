@@ -1,62 +1,72 @@
 class Solution {
+    int diff;
     int[] answer = new int[11];
-    int maxDiff = -1;
     public int[] solution(int n, int[] info) {
-        dfs(n, 0, info, new int[11], 0);
-        if (maxDiff == -1) {
+        diff = -1;
+        int[] rion = new int[11];
+        dfs(rion, info, 0, n);
+        if (diff == -1) {
             return new int[]{-1};
         }
         return answer;
+    }
+    
+    void dfs(int[] rion, int[] info, int depth, int count) {
+        if (depth == 10) {
+            int rionScore = 0;
+            int apeachScore = 0;
+            for (int i = 0; i < 10; i++) {
+                if (rion[i] > info[i]) {
+                    rionScore += 10 - i;
+                }
+                if (rion[i] < info[i]) {
+                    apeachScore += 10 - i;
+                }
+                if (rion[i] == info[i]) {
+                    if (rion[i] == 0) {
+                        continue;
+                    }
+                    apeachScore += 10 - i;
+                }
+            }
+            if (rionScore > apeachScore && diff < rionScore - apeachScore) {
+                for (int i = 0; i < 10; i++) {
+                    answer[i] = rion[i];
+                }
+                answer[10] = count;
+                diff = rionScore - apeachScore;
+            }
+            else if (rionScore > apeachScore && diff == rionScore - apeachScore) {
+                for (int i = 10; i >= 0; i--) {
+                    if (answer[i] > rion[i]) {
+                        return;
+                    }
+                    if (answer[i] < rion[i]) {
+                        break;
+                    }
+                }
+                for (int i = 0; i < 10; i++) {
+                    answer[i] = rion[i];
+                }
+                answer[10] = count;
+                diff = rionScore - apeachScore;
+            }
+            return;
+        }
         
+        // lose
+        dfs(rion, info, depth+1, count);
+        
+        // win
+        if (info[depth] + 1 <= count) {
+            rion[depth] = info[depth] + 1;
+            dfs(rion, info, depth+1, count - (info[depth] + 1));
+            rion[depth] = 0;
+        }
     }
     
-    void dfs(int n, int i, int[] info, int[] arrow, int count) {
-        if (i == 10) {
-            calculate(info, arrow, count, n);
-            return;
-        }
-        if (info[i] < n-count) {
-            arrow[i] = info[i]+1;
-            dfs(n, i+1, info, arrow, count+info[i]+1);
-        }
-        arrow[i] = 0;
-        dfs(n, i+1, info, arrow, count);
-    }
-    
-    void calculate(int[] info, int[] arrow, int count, int n) {
-        int lion = 0;
-        int peach = 0;
-        for (int i = 0; i < 10; i++) {
-            // 둘 다 못맞춘 상황
-            if (arrow[i] == 0 && info[i] == 0) {
-                continue;
-            }
-            // 라이언이 이김
-            if (arrow[i] != 0) {
-                lion += 10-i;
-                continue;
-            }
-            peach += 10-i;
-        }
-        arrow[10] = n-count;
-        int diff = lion - peach;
-        // 라이언이 진 상황
-        if (diff <= 0 || diff < maxDiff) {
-            return;
-        }
-        if (diff == maxDiff) {
-            for (int i = 10; i >= 0; i--) {
-                if (answer[i] > arrow[i]) {
-                    return;
-                }
-                if (answer[i] < arrow[i]) {
-                    break;
-                }
-            }
-        }
-        for (int i = 0; i < 11; i++) {
-            answer[i] = arrow[i];
-        }
-        maxDiff = diff;
-    }
+    /**
+    라이언이 가장 큰 점수 차이로 우승해야 함 -> 가장 효율적으로 이김
+    10점부터 이길지말지 dfs
+    */
 }
