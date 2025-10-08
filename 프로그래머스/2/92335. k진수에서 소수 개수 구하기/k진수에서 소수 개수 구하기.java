@@ -1,26 +1,30 @@
-import java.util.*;
-
 class Solution {
     public int solution(int n, int k) {
-        StringBuilder sb = new StringBuilder();
-        
-        while (n / k != 0) {
-            sb.append(n % k);
-            n /= k;
-        }
-        sb.append(n);
-        
-        String number = sb.reverse().toString();
-        
-        String[] candidates = number.split("0");
+        String string = Integer.toString(n, k);
+        int start = -1;
+        int end = 0;
         
         int answer = 0;
-        for (String s : candidates) {
-            if (s.isEmpty()) {
-                continue;
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) == '0') {
+                if (start == -1) {
+                    continue;
+                }
+                long number = Long.parseLong(string.substring(start, i));
+                if (isPrime(number)) {
+                    answer++;
+                }
+                start = -1;
             }
-            long cand = Long.parseLong(s);
-            if (isPrime(cand)) {
+            else {
+                if (start == -1) {
+                    start = i;
+                }
+            }
+        }
+        if (start != -1) {
+            long number = Long.parseLong(string.substring(start, string.length()));
+            if (isPrime(number)) {
                 answer++;
             }
         }
@@ -28,13 +32,12 @@ class Solution {
         return answer;
     }
     
-    boolean isPrime(long n) {
-        if (n <= 1) {
+    boolean isPrime(long number) {
+        if (number == 1) {
             return false;
         }
-        long sqrt = (long) Math.sqrt(n);
-        for (long i = 2; i <= sqrt; i++) {
-            if (n % i == 0) {
+        for (long i = 2; i * i <= number; i++) {
+            if (number % i == 0) {
                 return false;
             }
         }
