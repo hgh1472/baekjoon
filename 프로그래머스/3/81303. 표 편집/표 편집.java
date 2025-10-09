@@ -1,90 +1,90 @@
 import java.util.*;
 
 class Solution {
-    static Stack<Node> history;
+    Deque<Node> stack;
+    boolean[] notContains;
     public String solution(int n, int k, String[] cmd) {
-        history = new Stack<>();
-        
-        Node start = new Node(-1);
-        Node curr = start;
-        for (int i = 0; i < n; i++) {
-            Node node = new Node(i);
-            curr.next = node;
-            node.prev = curr;
-            curr = node;
+        Node[] nodes = new Node[n+2];
+        nodes[0] = new Node(-1);
+        nodes[n+1] = new Node(-1);
+        for (int i = 1; i <= n; i++) {
+            nodes[i] = new Node(i);
+            nodes[i].prev = nodes[i-1];
+            nodes[i-1].next = nodes[i];
         }
-        Node end = new Node(-1);
-        curr.next = end;
-        end.prev = curr;
+        nodes[n].next = nodes[n+1];
+        Node cursor = nodes[1 + k];
         
-        Node cursor = start;
-        for (int i = 0; i <= k; i++) {
-            cursor = cursor.next;
-        }
-        for (String c : cmd) {
-            String[] s = c.split(" ");
-            if (s[0].equals("U")) {
-                cursor = cursor.up(Integer.parseInt(s[1]));
+        notContains = new boolean[n+1];
+        stack = new ArrayDeque<>();
+        for (int i = 0; i < cmd.length; i++) {
+            String[] info = cmd[i].split(" ");
+            if (info[0].equals("U")) {
+                int move = Integer.parseInt(info[1]);
+                cursor = cursor.up(move);
             }
-            if (s[0].equals("D")) {
-                cursor = cursor.down(Integer.parseInt(s[1]));
+            if (info[0].equals("D")) {
+                int move = Integer.parseInt(info[1]);
+                cursor = cursor.down(move);
             }
-            if (s[0].equals("C")) {
+            if (info[0].equals("C")) {
+                stack.add(cursor);
+                notContains[cursor.number] = true;
                 cursor = cursor.remove();
             }
-            if (s[0].equals("Z")) {
-                Node pop = history.pop();
-                pop.restore();
+            if (info[0].equals("Z")) {
+                Node pop = stack.removeLast();
+                pop.rollback();
+                notContains[pop.number] = false;
             }
         }
+        
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++)
-            sb.append("O");
-        while (!history.isEmpty()) {
-            Node node = history.pop();
-            sb.setCharAt(node.value, 'X');
+        for (int i = 1; i <= n; i++) {
+            if (notContains[i]) {
+                sb.append("X");
+            }
+            else {
+                sb.append("O");
+            }
         }
         return sb.toString();
     }
     
     class Node {
-        int value;
-        Node prev;
-        Node next;
+        int number;
+        Node prev, next;
         
-        Node(int value) {
-            this.value = value;
-            prev = null;
-            next = null;
+        Node(int number) {
+            this.number = number;
         }
         
-        public Node up(int k) {
-            Node cursor = this;
-            for (int i = 0; i < k; i++) {
-                cursor = cursor.prev;
+        Node up(int move) {
+            Node prev = this;
+            for (int i = 0; i < move; i++) {
+                prev = prev.prev;
             }
-            return cursor;
+            return prev;
         }
         
-        public Node down(int k) {
-            Node cursor = this;
-            for (int i = 0; i < k; i++) {
-                cursor = cursor.next;
+        Node down(int move) {
+            Node next = this;
+            for (int i = 0; i < move; i++) {
+                next = next.next;
             }
-            return cursor;
+            return next;
         }
         
-        public Node remove() {
-            Node cursor = this;
-            history.push(this);
-            cursor.prev.next = this.next;
-            cursor.next.prev = this.prev;
-            if (cursor.next.value == -1)
+        Node remove() {
+            this.prev.next = this.next;
+            this.next.prev = this.prev;
+            if (this.next.number == -1) {
                 return this.prev;
+            }
             return this.next;
         }
         
-        public void restore() {
+        void rollback() {
             this.prev.next = this;
             this.next.prev = this;
         }
