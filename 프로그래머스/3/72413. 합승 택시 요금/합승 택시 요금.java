@@ -1,62 +1,41 @@
 import java.util.*;
 
 class Solution {
+    int[][] distance;
+    int NOT_CONNECT = 50000000;
     public int solution(int n, int s, int a, int b, int[][] fares) {
-        Map<Integer, List<Node>> edges = new HashMap<>();
+        distance = new int[n+1][n+1];
         for (int i = 1; i <= n; i++) {
-            edges.put(i, new ArrayList<>());
+            Arrays.fill(distance[i], NOT_CONNECT);
+            distance[i][i] = 0;
         }
         for (int[] fare : fares) {
-            edges.get(fare[0]).add(new Node(fare[1], fare[2]));
-            edges.get(fare[1]).add(new Node(fare[0], fare[2]));
-        }
-        int[][] distance = new int[n+1][n+1];
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                distance[i][j] = Integer.MAX_VALUE;
-            }
+            distance[fare[0]][fare[1]] = fare[2];
+            distance[fare[1]][fare[0]] = fare[2];
         }
         
-        for (int i = 1; i <= n; i++) {
-            PriorityQueue<Node> q = new PriorityQueue<>();
-            distance[i][i] = 0;
-            q.add(new Node(i, 0));
-            while (!q.isEmpty()) {
-                Node node = q.poll();
-                if (distance[i][node.num] < node.distance) {
-                    continue;
-                }
-                // distance[i][node.num] = node.distance;
-                for (Node e : edges.get(node.num)) {
-                    if (distance[i][e.num] <= node.distance + e.distance) {
+        for (int k = 1; k <= n; k++) {
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    if (distance[i][k] == NOT_CONNECT || distance[k][j] == NOT_CONNECT) {
                         continue;
                     }
-                    distance[i][e.num] = node.distance + e.distance;
-                    q.add(new Node(e.num, node.distance + e.distance));
+                    distance[i][j] = Math.min(distance[i][k] + distance[k][j], distance[i][j]);
+                    distance[j][i] = distance[i][j];
                 }
             }
         }
         
         int answer = Integer.MAX_VALUE;
-        for (int i = 1; i<= n; i++) {
-            int d = distance[s][i] + distance[i][a] + distance[i][b];
-            answer = Math.min(answer, d);
+        for (int i = 1; i <= n; i++) {
+            int common = distance[s][i];
+            if (common == NOT_CONNECT) {
+                continue;
+            }
+            int cost1 = distance[i][a];
+            int cost2 = distance[i][b];
+            answer = Math.min(answer, common + cost1 + cost2);
         }
         return answer;
-    }
-    
-    class Node implements Comparable<Node> {
-        int num;
-        int distance;
-        
-        Node(int num, int distance) {
-            this.num = num;
-            this.distance = distance;
-        }
-        
-        @Override
-        public int compareTo(Node o) {
-            return this.distance - o.distance;
-        }
     }
 }
