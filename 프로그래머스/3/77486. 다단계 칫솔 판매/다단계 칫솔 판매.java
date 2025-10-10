@@ -1,79 +1,33 @@
 import java.util.*;
 
 class Solution {
-    Map<String, Person> enrolls = new HashMap<>();
     public int[] solution(String[] enroll, String[] referral, String[] seller, int[] amount) {
-        
-        PriorityQueue<Person> q = new PriorityQueue<>();
-        
+        Map<String, String> parents = new HashMap<>();
+        Map<String, Integer> profits = new HashMap<>();
         for (int i = 0; i < enroll.length; i++) {
-            int level = (referral[i].equals("-")) ? 0 : enrolls.get(referral[i]).level+1;
-            Person p = new Person(enroll[i], referral[i], level);
-            enrolls.put(enroll[i], p);
-            q.add(p);
+            parents.put(enroll[i], referral[i]);
+            profits.put(enroll[i], 0);
         }
         
         for (int i = 0; i < seller.length; i++) {
-            enrolls.get(seller[i]).add(amount[i] * 100);
-        }
-        
-        while (!q.isEmpty()) {
-            Person poll = q.poll();
-            for (int income : poll.income) {
-                Person start = poll;
-                int plus = income/10;
-                start.sum -= plus;
-                if (start.parent.equals("-")) {
-                    continue;
-                }
-                enrolls.get(start.parent).plus += plus;
-                start = enrolls.get(start.parent);
-                plus /= 10;
-                while (plus > 0) {
-                    start.plus -= plus;
-                    if (start.parent.equals("-")) {
-                        break;
-                    }
-                    enrolls.get(start.parent).plus += plus;
-                    start = enrolls.get(start.parent);
-                    plus /= 10;
-                }
+            int income = amount[i] * 100;
+            int out = income * 10 / 100;
+            int profit = income - out;
+            profits.put(seller[i], profits.get(seller[i]) + profit);
+            String parent = parents.get(seller[i]);
+            while (out != 0 && !parent.equals("-")) {
+                income = out;
+                out = income * 10 / 100;
+                profit = income - out;
+                profits.put(parent, profits.get(parent) + profit);
+                parent = parents.get(parent);
             }
         }
         
         int[] answer = new int[enroll.length];
         for (int i = 0; i < enroll.length; i++) {
-            Person p = enrolls.get(enroll[i]);
-            answer[i] = p.sum + p.plus;
+            answer[i] = profits.get(enroll[i]);
         }
-        
         return answer;
-    }
-    
-    class Person implements Comparable<Person> {
-        String name;
-        String parent;
-        int level;
-        List<Integer> income = new ArrayList<>();
-        int plus;
-        int sum;
-        
-        Person(String name, String parent, int level) {
-            this.name = name;
-            this.parent = parent;
-            this.level = level;
-            this.plus = 0;
-            this.sum = 0;
-        }
-        
-        public void add(int income) {
-            this.income.add(income);
-            this.sum += income;
-        }
-        
-        @Override
-        public int compareTo(Person p) {
-            return p.level - this.level;
-        }
     }
 }
