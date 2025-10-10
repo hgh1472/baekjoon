@@ -1,79 +1,61 @@
-import java.util.*;
-
 class Solution {
-    static long[] time = new long[360000];
     public String solution(String play_time, String adv_time, String[] logs) {
-        int playTime = switchSecond(play_time);
-        int advTime = switchSecond(adv_time);
-        long maxTime = 0;
-        
+        int maxTime = convert(play_time);
+        long[] arr = new long[maxTime+2];
         for (String log : logs) {
-            String[] input = log.split("-");
-            int start = switchSecond(input[0]);
-            int end = switchSecond(input[1]);
-            time[start] += 1;
-            time[end] -= 1;
+            String[] info = log.split("-");
+            int start = convert(info[0]);
+            int end = convert(info[1]);
+            arr[start]++;
+            arr[end]--;
         }
         
-        for (int i = 1; i <= playTime; i++) {
-            time[i] = time[i] + time[i - 1];
+        long sum = 0;
+        for (int i = 0; i <= maxTime; i++) {
+            sum += arr[i];
+            arr[i] = sum;
         }
-        
-        for (int i = 1; i <= playTime; i++) {
-            time[i] = time[i] + time[i - 1];
+        for (int i = 1; i <= maxTime; i++) {
+            arr[i] += arr[i-1];
         }
-        
-        int startTime = 0;
-        // i = 광고 시작 시간
-        for (int i = 0; i <= playTime - advTime; i++) {
-            long sum = 0;
-            if (i == 0) {
-                sum = time[i + advTime - 1];
-            }
-            else {
-                sum = time[i + advTime - 1] - time[i-1];
-            }
-            if (maxTime < sum) {
-                maxTime = sum;
-                startTime = i;
+        int duration = convert(adv_time);
+        long max = 0;
+        int answer = 0;
+        for (int start = 0; start <= maxTime-duration; start++) {
+            long minus = (start == 0) ? 0 : arr[start-1];
+            long viewer = arr[start+duration-1] - minus;
+            if (max < viewer) {
+                max = viewer;
+                answer = start;
             }
         }
-        // return String.valueOf(time[3600]);
-        return switchString(startTime);
+        return convert(answer);
     }
     
-    public int switchSecond(String t) {
-        String[] input = t.split(":");
-        int second = Integer.parseInt(input[2]);
-        int minute = Integer.parseInt(input[1]);
-        int hour = Integer.parseInt(input[0]);
-        int result = 0;
-        result += 3600 * hour;
-        result += 60 * minute;
-        result += second;
-        return result;
+    int convert(String time) {
+        String[] info = time.split(":");
+        int second = Integer.parseInt(info[2]);
+        second += Integer.parseInt(info[1]) * 60;
+        second += Integer.parseInt(info[0]) * 60 * 60;
+        return second;
     }
     
-    public String switchString(int second) {
+    String convert(int second) {
         StringBuilder sb = new StringBuilder();
         int hour = second / 3600;
-        if (hour / 10 == 0) {
+        if (hour < 10) {
             sb.append("0");
         }
         sb.append(hour).append(":");
-        second %= 3600;
-        
-        int minute = second / 60;
-        if (minute / 10 == 0) {
+        int minute = (second % 3600) / 60;
+        if (minute < 10) {
             sb.append("0");
         }
         sb.append(minute).append(":");
-        
-        second %= 60;
-        if (second / 10 == 0) {
+        if (second % 60 < 10) {
             sb.append("0");
         }
-        sb.append(second);
+        sb.append(second % 60);
         return sb.toString();
     }
 }
