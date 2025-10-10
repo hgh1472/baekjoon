@@ -1,129 +1,108 @@
 import java.util.*;
+
 class Solution {
-    Map<Integer, List<Point>> map = new HashMap<>();
-    boolean[] visited;
-    boolean[] contains = new boolean[7];
-    int n = 0;
-    int startX, startY;
-    int dist = Integer.MAX_VALUE;
-    int[][] info;
+    int[][] board;
     int[] dx = {-1, 1, 0, 0};
     int[] dy = {0, 0, -1, 1};
-    
+    boolean[] visited;
     public int solution(int[][] board, int r, int c) {
-        info = board;
-        int answer = 0;
-        startX = r;
-        startY = c;
-        for (int i = 1; i <= 6; i++) {
-            map.put(i, new ArrayList<>());
-        }
-        
+        this.visited = new boolean[7];
+        this.board = board;
+        int count = 0;
+        Arrays.fill(visited, true);
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 if (board[i][j] != 0) {
-                    map.get(board[i][j]).add(new Point(i, j));
-                    contains[board[i][j]] = true;
-                    n++;
+                    count++;
+                    visited[board[i][j]] = false;
                 }
             }
         }
-        n /= 2;
+        count /= 2;
         
-        visited = new boolean[7];
-        getOrder(0, 0, new Point(startX, startY));
-        return dist;
+        return dfs(r, c, count);
     }
     
-    
-    void getOrder(int d, int value, Point cur) {
-        if (d == n) {
-            dist = Math.min(value, dist);
-            return;
+    int dfs(int x, int y, int count) {
+        if (count == 0) {
+            return 0;
         }
-        
+        int result = Integer.MAX_VALUE;
         for (int i = 1; i <= 6; i++) {
-            if (visited[i] || !contains[i]) {
+            if (visited[i]) {
                 continue;
             }
+            Node start = findCard(x, y, i);
+            board[start.x][start.y] = 0;
+            Node end = findCard(start.x, start.y, i);
+            board[end.x][end.y] = 0;
             visited[i] = true;
-            List<Point> points = map.get(i);
-            
-            Point p1 = points.get(0);
-            Point p2 = points.get(1);
-            
-            int dist1 = getDistance(cur.x, p1.x, cur.y, p1.y) + getDistance(p1.x, p2.x, p1.y, p2.y) + 2;
-            int dist2 = getDistance(cur.x, p2.x, cur.y, p2.y) + getDistance(p2.x, p1.x, p2.y, p1.y) + 2;
-            
-            info[p1.x][p1.y] = 0;
-            info[p2.x][p2.y] = 0;
-            
-            getOrder(d + 1, value + dist1, p2);
-            getOrder(d + 1, value + dist2, p1);
-            
-            info[p1.x][p1.y] = i;
-            info[p2.x][p2.y] = i;
+            result = Math.min(result, dfs(end.x, end.y, count - 1) + start.cost + end.cost + 2);
             visited[i] = false;
+            board[start.x][start.y] = i;
+            board[end.x][end.y] = i;
         }
+        return result;
     }
     
-    
-    int getDistance(int x1, int x2, int y1, int y2) {
-        Queue<Point> q = new ArrayDeque();
-        int[][] count = new int[4][4];
-        
-        q.add(new Point(x1, y1));
-        count[x1][y1] = 1;
-        
+    Node findCard(int x, int y, int card) {
+        PriorityQueue<Node> q = new PriorityQueue<>();
+        if (board[x][y] == card) {
+            return new Node(x, y, 0);
+        }
+        q.add(new Node(x, y, 0));
         while (!q.isEmpty()) {
-            Point p = q.poll();
-            if (p.x == x2 && p.y == y2) {
-                return count[p.x][p.y] - 1;
-            }
+            Node poll = q.poll();
             for (int i = 0; i < 4; i++) {
-                int nx = p.x + dx[i];
-                int ny = p.y + dy[i];
-                if (nx < 0 || 4 <= nx || ny < 0 || 4 <= ny) {
+                int nx = poll.x + dx[i];
+                int ny = poll.y + dy[i];
+                if (isOutOfRange(nx, ny)) {
                     continue;
                 }
-                if (count[nx][ny] != 0) {
-                    continue;
+                if (board[nx][ny] == card) {
+                    return new Node(nx, ny, poll.cost + 1);
                 }
-                count[nx][ny] = count[p.x][p.y] + 1;
-                q.add(new Point(nx, ny));
-            }
-            
-            for (int i = 0; i < 4; i++) {
-                int nx = p.x + dx[i];
-                int ny = p.y + dy[i];
-                while (0 <= nx && nx < 4 && 0 <= ny && ny < 4) {
-                    if (info[nx][ny] != 0) {
-                        break;
-                    }
+                q.add(new Node(nx, ny, poll.cost + 1));
+                
+                // ctrl move
+                nx = poll.x;
+                ny = poll.y;
+                while (!isOutOfRange(nx + dx[i], ny + dy[i])) {
                     nx += dx[i];
                     ny += dy[i];
+                    if (board[nx][ny] != 0) {
+                        break;
+                    }
                 }
-                if (!(0 <= nx && nx < 4 && 0 <= ny && ny < 4)) {
-                    nx -= dx[i];
-                    ny -= dy[i];
+                if (poll.x + dx[i] != nx || poll.y + dy[i] != ny) {
+                    if (board[nx][ny] == card) {
+                        return new Node(nx, ny, poll.cost + 1);
+                    }
+                    q.add(new Node(nx, ny, poll.cost + 1));
                 }
-                if (count[nx][ny] != 0) {
-                    continue;
-                }
-                q.add(new Point(nx, ny));
-                count[nx][ny] = count[p.x][p.y] + 1;
             }
         }
-        return count[x2][y2] - 1;
+        
+        return null;
     }
     
-    class Point {
-        int x;
-        int y;
+    boolean isOutOfRange(int x, int y) {
+        return x < 0 || 4 <= x || y < 0 || 4 <= y;
+    }
+    
+    class Node implements Comparable<Node> {
+        int x, y;
+        int cost;
         
-        public Point(int x, int y) {
+        Node(int x, int y, int cost) {
             this.x = x;
             this.y = y;
+            this.cost = cost;
+        }
+        
+        @Override
+        public int compareTo(Node n) {
+            return this.cost - n.cost;
         }
     }
 }
