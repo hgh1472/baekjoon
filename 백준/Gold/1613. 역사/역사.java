@@ -16,23 +16,19 @@ public class Main {
         int k = Integer.parseInt(input[1]);
 
         nodes = new Node[n+1];
-        Map<Integer, Map<Integer, Boolean>> map = new HashMap<>();
-        for (int i = 1; i <= n; i++) {
-            nodes[i] = new Node(i);
-            map.put(i, new HashMap<>());
+
+        int[][] map = new int[n+1][n+1];
+        for (int i = 0; i < n + 1; i++) {
+            Arrays.fill(map[i], Integer.MAX_VALUE);
         }
         for (int i = 0; i < k; i++) {
             input = br.readLine().split(" ");
             int first = Integer.parseInt(input[0]);
             int second = Integer.parseInt(input[1]);
-            map.get(first).put(second, true);
-            nodes[first].next.add(nodes[second]);
+            map[first][second] = 1;
         }
 
-        for (int i = 1; i <= n; i++) {
-            boolean[] visited = new boolean[n+1];
-            dfs(visited, nodes[i], map, i);
-        }
+        floyd(map);
 
         int s = Integer.parseInt(br.readLine());
         for (int i = 0; i < s; i++) {
@@ -40,14 +36,11 @@ public class Main {
             int a = Integer.parseInt(input[0]);
             int b = Integer.parseInt(input[1]);
 
-            boolean isFind = false;
-            Map<Integer, Boolean> aNext = map.get(a);
-            if (aNext.containsKey(b)) {
+            if (map[a][b] != Integer.MAX_VALUE) {
                 System.out.println(-1);
                 continue;
             }
-            Map<Integer, Boolean> bNext = map.get(b);
-            if (bNext.containsKey(a)) {
+            if (map[b][a] != Integer.MAX_VALUE) {
                 System.out.println(1);
                 continue;
             }
@@ -55,14 +48,16 @@ public class Main {
         }
     }
 
-    static void dfs(boolean[] visited, Node node, Map<Integer, Map<Integer, Boolean>> map, int start) {
-        if (visited[node.number]) {
-            return;
-        }
-        visited[node.number] = true;
-        map.get(start).put(node.number, true);
-        for (Node n : node.next) {
-            dfs(visited, n, map, start);
+    static void floyd(int[][] map) {
+        for (int i = 1; i < map.length; i++) {
+            for (int j = 1; j < map.length; j++) {
+                for (int k = 1; k < map.length; k++) {
+                    if (map[j][i] == Integer.MAX_VALUE || map[i][k] == Integer.MAX_VALUE) {
+                        continue;
+                    }
+                    map[j][k] = Math.min(map[j][k], map[j][i] + map[i][k]);
+                }
+            }
         }
     }
 
