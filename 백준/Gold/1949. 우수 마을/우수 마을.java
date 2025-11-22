@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
+/**
+ * Tree DP
+ *
+ */
 public class Main {
     static boolean[] visited;
     static int n;
@@ -20,10 +23,6 @@ public class Main {
         Node[] nodes = new Node[n];
         dp = new int[n][2];
         for (int i = 0; i < n; i++) {
-            dp[i][0] = -1;
-            dp[i][1] = -1;
-        }
-        for (int i = 0; i < n; i++) {
             nodes[i] = new Node(i);
         }
         for (int i = 0; i < n - 1; i++) {
@@ -31,47 +30,23 @@ public class Main {
             nodes[input[0] - 1].subs.add(nodes[input[1] - 1]);
             nodes[input[1] - 1].subs.add(nodes[input[0] - 1]);
         }
+        dfs(nodes[0]);
 
-        visited[0] = true;
-        int answer = dfs(nodes[0], false);
-        System.out.println(answer);
+        System.out.println(Math.max(dp[0][0], dp[0][1]));
     }
 
-    static int dfs(Node node, boolean impossible) {
-        int result1 = 0;
-
-        // 우수 마을이 되지 않는 경우
-        if (dp[node.number][0] == -1) {
-            for (Node sub : node.subs) {
-                if (visited[sub.number]) {
-                    continue;
-                }
-                visited[sub.number] = true;
-                result1 += dfs(sub, false);
-                visited[sub.number] = false;
+    static void dfs(Node node) {
+        visited[node.number] = true;
+        dp[node.number][0] = 0;
+        dp[node.number][1] = people[node.number];
+        for (Node sub : node.subs) {
+            if (visited[sub.number]) {
+                continue;
             }
-            dp[node.number][0] = result1;
+            dfs(sub);
+            dp[node.number][0] += Math.max(dp[sub.number][0], dp[sub.number][1]);
+            dp[node.number][1] += dp[sub.number][0];
         }
-        result1 = dp[node.number][0];
-        if (impossible) {
-            return result1;
-        }
-
-        // 우수 마을이 될 수 있는 경우
-        int result2 = people[node.number];
-        if (dp[node.number][1] == -1) {
-            for (Node sub : node.subs) {
-                if (visited[sub.number]) {
-                    continue;
-                }
-                visited[sub.number] = true;
-                result2 += dfs(sub, true);
-                visited[sub.number] = false;
-            }
-            dp[node.number][1] = result2;
-        }
-        result2 = dp[node.number][1];
-        return Math.max(result1, result2);
     }
 
     static class Node {
