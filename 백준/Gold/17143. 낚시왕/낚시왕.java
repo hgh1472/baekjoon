@@ -84,6 +84,12 @@ public class Main {
 
         public void move() {
             int count = speed;
+            if (dir == UP || dir == DOWN) {
+                count %= ((r-1) * 2);
+            }
+            else {
+                count %= ((c-1) * 2);
+            }
             while (count != 0) {
                 int next = 0;
                 int nextDir = dir;
