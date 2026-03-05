@@ -11,17 +11,18 @@ public class Main {
         n = input[0];
         k = input[1];
         c = input[2];
-        int[] numbers = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
+        long[] numbers = Arrays.stream(br.readLine().split(" ")).mapToLong(Long::parseLong).toArray();
         Arrays.sort(numbers);
 
         int left = 0;
         int right = Math.min(k, n);
-        int steel = 0;
+        long steel = 0;
         for (int i = left; i < right; i++) {
             steel += numbers[i];
         }
 
-        int weight = 0, idx = 0;
+        long weight = 0;
+        int idx = 0;
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i <= c; i++) {
             if (i - weight >= numbers[idx]) {
