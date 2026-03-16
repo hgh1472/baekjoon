@@ -10,36 +10,34 @@ public class Main {
 
         int n = Integer.parseInt(br.readLine());
 
-        arr = new long[n][2];
+        arr = new long[n+1][2];
 
         for (int i = 0; i < n; i++) {
             arr[i] = Arrays.stream(br.readLine().split(" ")).mapToLong(Long::parseLong).toArray();
         }
 
-        solve(0, 0, n, new boolean[n]);
+        solve(0, 0, n, 0);
         System.out.println(answer);
     }
 
-    static void solve(int idx, int count, int n, boolean[] visited) {
+    static void solve(int idx, int count, int n, int cur) {
         if (idx == n) {
             if (count == 0) {
                 return;
             }
-            long result = calculate(visited, n);
+            long result = calculate(cur, n);
             answer = Math.min(answer, result);
             return;
         }
-        visited[idx] = true;
-        solve(idx + 1, count + 1, n, visited);
-        visited[idx] = false;
-        solve(idx + 1, count, n, visited);
+        solve(idx + 1, count + 1, n, cur | (1 << idx));
+        solve(idx + 1, count, n, cur);
     }
 
-    static long calculate(boolean[] visited, int n) {
+    static long calculate(int cur, int n) {
         long a = 1;
         long b = 0;
         for (int i = 0; i < n; i++) {
-            if (!visited[i]) {
+            if ((cur & (1 << i)) != (1 << i)) {
                 continue;
             }
             a *= arr[i][0];
