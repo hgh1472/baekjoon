@@ -13,7 +13,7 @@ public class Main {
 
         n = Integer.parseInt(br.readLine());
 
-        arr = new long[n][2];
+        arr = new long[n][n];
         for (int i = 0; i < n; i++) {
             arr[i] = Arrays.stream(br.readLine().split(" ")).mapToLong(Long::parseLong).toArray();
         }
@@ -45,25 +45,14 @@ public class Main {
     }
 
     static long calculate(int cur) {
-        boolean[][] visited = new boolean[n][n];
         long a = 0, b = 0;
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+            for (int j = i + 1; j < n; j++) {
                 if ((cur & (1 << i)) == (1 << i) && (cur & (1 << j)) == (1 << j)) {
-                    if (visited[i][j]) {
-                        continue;
-                    }
                     a += arr[i][j] + arr[j][i];
-                    visited[i][j] = true;
-                    visited[j][i] = true;
                 }
                 if ((cur & (1 << i)) == 0 && (cur & (1 << j)) == 0) {
-                    if (visited[i][j]) {
-                        continue;
-                    }
                     b += arr[i][j] + arr[j][i];
-                    visited[i][j] = true;
-                    visited[j][i] = true;
                 }
             }
         }
